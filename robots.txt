@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://sonyit.github.io/ManagerProBeta/sitemap.xml
