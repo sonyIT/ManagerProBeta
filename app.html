@@ -224,8 +224,8 @@ V.roles=()=>{const used=new Set(S.teams.flatMap(t=>t.members.map(m=>m.r))),rs=S.
 
 /* ===== MANAGER PRO : compte en ligne, offre Pro, installation ===== */
 /* À REMPLIR plus tard (voir le guide). Tant que SB_URL est vide, l’application reste en mode local, sans limite. */
-const SB_URL="https://rhomjgdiyduflhzfljfk.supabase.co",SB_KEY="sb_publishable_dru1xsB4g8B7frdUI0tZxw_Yo5Wu4zy",LIEN_PAIEMENT="",LIMITE_GRATUIT=2;
-/* Paiement. LIEN_PAIEMENT = lien carte bancaire.MOBILE_MONEY = vos numéros. WHATSAPP = numéro avec indicatif pays, chiffres seulement. */
+const SB_URL="",SB_KEY="",LIEN_PAIEMENT="",LIMITE_GRATUIT=2;
+/* Paiement. LIEN_PAIEMENT = lien carte bancaire. MOBILE_MONEY = vos numéros. WHATSAPP = numéro avec indicatif pays, chiffres seulement. */
 const PRIX_PRO="6 € par mois",WHATSAPP="",EMAIL_PARAM="";/* EMAIL_PARAM : nom du paramètre qui préremplit l’e-mail dans votre lien de paiement (Stripe : prefilled_email ; Lemon Squeezy : checkout[email]). Laissez vide si vous ne savez pas. */
 const MOBILE_MONEY=[/* {nom:"MTN Mobile Money",numero:"06 000 00 00",titulaire:"Votre nom"},{nom:"Airtel Money",numero:"05 000 00 00",titulaire:"Votre nom"} */];
 let sb=null,USER=null,ORG=null,PLAN="gratuit",tmC,DEFER=null;
