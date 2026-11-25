@@ -8,17 +8,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap">
 <style>
-:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light;--bg:#f2f5f4;--sf:#fff;--tx:#14201d;--mt:#5f6f6a;--bd:#dde4e1;--pr:#0e7c66;--pr2:#dff2ec;--ok:#0e7c66;--ko:#c8372d;--wn:#c47a10;--nv:#14201d;--nt:#e8efec}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0e1513;--sf:#16201d;--tx:#e8efec;--mt:#93a49e;--bd:#26332f;--pr:#3cc5a4;--pr2:#17332c;--ok:#3cc5a4;--ko:#ff7b6e;--wn:#f0b04a;--nv:#0a100e;--nt:#e8efec}}
-:root[data-theme="dark"]{color-scheme:dark;--bg:#0e1513;--sf:#16201d;--tx:#e8efec;--mt:#93a49e;--bd:#26332f;--pr:#3cc5a4;--pr2:#17332c;--ok:#3cc5a4;--ko:#ff7b6e;--wn:#f0b04a;--nv:#0a100e;--nt:#e8efec}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light;--bg:#edf2f0;--sf:#fff;--tx:#0a1411;--mt:#3f4f4a;--bd:#bccac5;--pr:#0a6652;--onpr:#fff;--prt:#064a3b;--pr2:#d3ece4;--ok:#0a6652;--ko:#b3261e;--wn:#8f5200;--nv:#0f1d1a;--nt:#f3f8f6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0a1110;--sf:#131c19;--tx:#f3f8f6;--mt:#b9c8c2;--bd:#374844;--pr:#3fd0ae;--onpr:#04211a;--prt:#8fe8d1;--pr2:#173b32;--ok:#4be0b8;--ko:#ff8f82;--wn:#f7bd5e;--nv:#070d0c;--nt:#f3f8f6}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0a1110;--sf:#131c19;--tx:#f3f8f6;--mt:#b9c8c2;--bd:#374844;--pr:#3fd0ae;--onpr:#04211a;--prt:#8fe8d1;--pr2:#173b32;--ok:#4be0b8;--ko:#ff8f82;--wn:#f7bd5e;--nv:#070d0c;--nt:#f3f8f6}
 html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
-body{margin:0;height:100%;background:var(--bg);color:var(--tx);font:15px/1.5 Manrope,system-ui,-apple-system,"Segoe UI",sans-serif}
+body{margin:0;height:100%;background:var(--bg);color:var(--tx);font:var(--fs,15px)/1.5 Manrope,system-ui,-apple-system,"Segoe UI",sans-serif}
 .app{display:flex;height:100%}
 nav{width:210px;flex:none;background:var(--nv);color:var(--nt);padding:18px 12px;display:flex;flex-direction:column;gap:4px}
 nav h3{margin:0 8px 14px;font-size:18px;font-weight:800}
-nav button{background:none;border:0;color:inherit;text-align:left;padding:9px 10px;border-radius:8px;font:inherit;cursor:pointer;opacity:.75}
-nav button.on{background:var(--pr);color:#fff;opacity:1;font-weight:600}
+nav button{background:none;border:0;color:inherit;text-align:left;padding:9px 10px;border-radius:8px;font:inherit;cursor:pointer;opacity:.92}
+nav button.on{background:var(--pr);color:var(--onpr);opacity:1;font-weight:600}
 nav .sp{flex:1}
 main{flex:1;overflow:auto;padding:22px;min-width:0}
 h1{margin:0 0 16px;font-size:26px;font-weight:800}h2{font-size:17px;margin:22px 0 10px}
@@ -31,13 +31,13 @@ input,select,textarea{font:inherit;color:inherit;background:var(--sf);border:1px
 input:disabled,select:disabled,textarea:disabled{opacity:.8;background:var(--bg)}
 label{display:block;font-size:13px;color:var(--mt);margin:10px 0 3px}
 button.b,button.g{font:inherit;border-radius:8px;padding:8px 13px;cursor:pointer;border:1px solid var(--pr)}
-button.b{background:var(--pr);color:#fff}button.g{background:none;color:var(--pr)}button.d{border-color:var(--ko);color:var(--ko)}
+button.b{background:var(--pr);color:var(--onpr)}button.g{background:none;color:var(--pr)}button.d{border-color:var(--ko);color:var(--ko)}
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--pr);outline-offset:2px}
 .bar{height:8px;background:var(--bd);border-radius:4px;overflow:hidden;margin:6px 0}.bar i{display:block;height:100%;background:var(--pr)}.bar i.ko{background:var(--ko)}
 table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--bd);vertical-align:top}th{color:var(--mt);font-weight:600;font-size:13px}
 .tw{overflow-x:auto}.mt{color:var(--mt)}.ok{color:var(--ok)}.ko{color:var(--ko)}
-.tag{display:inline-block;padding:1px 9px;border-radius:99px;background:var(--pr2);color:var(--pr);font-size:12px;margin:2px 4px 2px 0}
-.tabs{display:flex;gap:4px;flex-wrap:wrap;margin:8px 0}.tabs button{border:0;background:none;color:var(--mt);font:inherit;padding:6px 11px;border-radius:99px;cursor:pointer}.tabs button.on{background:var(--pr2);color:var(--pr);font-weight:600}
+.tag{display:inline-block;padding:1px 9px;border-radius:99px;background:var(--pr2);color:var(--prt);font-size:13px;margin:2px 4px 2px 0}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;margin:8px 0}.tabs button{border:0;background:none;color:var(--mt);font:inherit;padding:6px 11px;border-radius:99px;cursor:pointer}.tabs button.on{background:var(--pr2);color:var(--prt);font-weight:600}
 .kb{display:grid;grid-template-columns:repeat(3,minmax(200px,1fr));gap:10px;overflow-x:auto}
 .col{background:var(--pr2);border-radius:10px;padding:8px;min-height:120px}.col h4{margin:2px 4px 8px}
 .tk{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:9px;margin-bottom:8px;cursor:pointer}
@@ -52,7 +52,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:8px 6px;
 .md input,.md select,.md textarea{width:100%}
 #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:24px;background:var(--tx);color:var(--bg);padding:9px 16px;border-radius:99px;z-index:99;display:none}
 @media (max-width:760px){.app{flex-direction:column-reverse}nav{width:auto;flex-direction:row;overflow-x:auto;padding:6px}nav h3,nav .sp{display:none}nav button{white-space:nowrap}main{padding:14px}.kb{grid-template-columns:repeat(3,230px)}}
-</style><script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script></head><body>
+select option{background:var(--sf);color:var(--tx)}a{color:var(--prt)}::placeholder{color:var(--mt);opacity:.85}.card b,.md b{color:var(--tx)}</style><script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script></head><body>
 <div class="app"><nav id="nav"></nav><main id="main"></main></div>
 <div id="modal"></div><div id="toast"></div>
 <script>
@@ -156,7 +156,7 @@ let dc=0,dz=0;
 const p0=V.proj,t0=V.team,d0=V.dash;
 V.proj=()=>S.projects.length?p0():`<h1>Projets</h1><div class="card"><b>Aucun projet en cours</b><div class="row" style="margin-top:10px"><input id="np" placeholder="Nom du projet"><input id="nb" type="number" step="any" placeholder="Budget"><button class="b" onclick="addP()">Créer le projet</button></div></div>`;
 V.team=()=>S.projects.length?t0():`<h1>Équipes</h1><div class="card mt">Créez d’abord un projet : chaque équipe est rattachée à un projet.</div><button class="b" onclick="go('proj')">Créer un projet</button>`;
-V.dash=()=>d0()+(S.projects.length?"":`<div class="card"><b>Aucun projet en cours</b><p class="mt">Créez votre premier projet pour suivre son budget, ses tâches et son avancement.</p><button class="b" onclick="go('proj')">Créer un projet</button></div>`)+`<div class="row" style="margin-top:18px"><button class="g d" onclick="resetAll()">${dz?"Confirmer : tout effacer":"Tout effacer et repartir à zéro"}</button></div>`;
+V.dash=()=>d0()+(S.projects.length?"":`<div class="card"><b>Aucun projet en cours</b><p class="mt">Créez votre premier projet pour suivre son budget, ses tâches et son avancement.</p><button class="b" onclick="go('proj')">Créer un projet</button></div>`);
 function delP(){if(dc!=cp){dc=cp;render();return toast("Cliquez de nouveau pour supprimer ce projet, ses tâches, ses équipes et ses opérations.")}const id=cp;S.projects=S.projects.filter(p=>p.id!=id);S.tasks=S.tasks.filter(t=>t.pid!=id);S.teams=S.teams.filter(t=>t.pid!=id);S.tx=S.tx.filter(t=>t.pid!=id);dc=0;cp=S.projects[0]?S.projects[0].id:0;save();render();toast("Projet supprimé.")}
 function resetAll(){if(!dz){dz=1;render();return toast("Cliquez de nouveau pour effacer tous les projets et opérations.")}S.projects=[];S.tasks=[];S.teams=[];S.tx=[];dz=0;cp=0;save();render();toast("Tout est effacé.")}
 const csvCell=v=>{if(typeof v=="number")return String(v).replace(".",",");v=String(v==null?"":v);return /[";\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
@@ -256,7 +256,7 @@ if(sb){sb.auth.getSession().then(async r=>{const s=r.data&&r.data.session;if(s){
  sb.auth.onAuthStateChange(ev=>{if(ev=="PASSWORD_RECOVERY")box.innerHTML=`<div class="ov"><div class="md"><b style="font-size:18px">Nouveau mot de passe</b><label for="np2">Mot de passe (8 caractères minimum)</label><input id="np2" type="password" autocomplete="new-password"><div class="row" style="margin-top:14px"><button class="b" onclick="newPw()">Enregistrer</button></div></div></div>`})}
 /* Offre gratuite et offre Pro */
 const proOk=()=>!!sb&&PLAN=="pro";
-function goPro(){closeAuth();go("abo")}
+function goPro(){closeAuth();st="compte";go("set")}
 function upsell(msg){box.innerHTML=`<div class="ov" onclick="if(event.target==this)closeAuth()"><div class="md"><b style="font-size:18px">Offre Pro</b><p>${E(msg)}</p><ul><li>Projets illimités</li><li>Export CSV et Excel</li></ul><div class="row"><button class="b" onclick="goPro()">Passer à Pro</button><button class="g" onclick="closeAuth()">Plus tard</button></div></div></div>`}
 function payCard(){if(!USER)return authUI("Créez d’abord un compte : votre offre Pro y sera rattachée.","up");if(!LIEN_PAIEMENT){closeAuth();return toast("Le paiement n’est pas encore configuré.")}window.open(LIEN_PAIEMENT+(EMAIL_PARAM?(LIEN_PAIEMENT.includes("?")?"&":"?")+EMAIL_PARAM+"="+encodeURIComponent(USER.email):""),"_blank","noopener")}
 const ap0=addP;addP=function(){if(!isPro()&&S.projects.length>=LIMITE_GRATUIT)return upsell("L’offre gratuite est limitée à "+LIMITE_GRATUIT+" projets.");ap0()};
@@ -273,7 +273,6 @@ ${pro?"":`<h2>Payer l’offre Pro</h2><div class="card">${USER?"":`<p class="mt"
 addEventListener("beforeinstallprompt",e=>{e.preventDefault();DEFER=e;render()});
 function installApp(){if(!DEFER)return;DEFER.prompt();DEFER=null;render()}
 if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
-const rn0=render;render=function(){rn0();$("#nav").insertAdjacentHTML("beforeend",`<div style="margin-top:10px;font-size:12px;opacity:.8;padding:0 10px">${USER?E(USER.email)+" · "+(isPro()?"Offre Pro":"Offre gratuite"):"Mode local (non connecté)"}</div>${USER?`<button onclick="logout()">Se déconnecter</button>`:`<button onclick="authUI('','in')">Se connecter</button>`}${DEFER?`<button onclick="installApp()">Installer l’application</button>`:""}<div style="font-size:12px;padding:6px 10px;opacity:.7"><a href="confidentialite.html" style="color:inherit">Confidentialité</a> · <a href="conditions.html" style="color:inherit">Conditions</a></div>`)};
 /* ===== FIN DU BLOC ===== */
 
 /* ===== MANAGER PRO : assistant intégré ===== */
@@ -290,8 +289,25 @@ const ASSISTANT_URL="";
  document.body.appendChild(b);document.body.appendChild(p)})();
 /* ===== FIN DU BLOC ===== */
 
-function render(){const it=[["dash","Tableau de bord"],["fin","Finances"],["proj","Projets"],["team","Équipes"],["roles","Rôles"],["abo","Compte et abonnement"]];
- $("#nav").innerHTML=`<h3 style="display:flex;align-items:center;gap:10px"><img src="logo.svg" width="38" height="38" alt="">Manager Pro</h3>`+it.map(([k,l])=>`<button class="${view==k?"on":""}" onclick="go('${k}')">${l}</button>`).join("")+`<span class="sp"></span><select style="margin-bottom:8px" onchange="setCur(this.value)" aria-label="Devise">${CUR.map(c=>`<option value="${c}"${c==(S.cur||"XAF")?" selected":""}>${c} · ${cn(c)}</option>`).join("")}</select><button onclick="theme()">Mode clair ou sombre</button>`;
+/* ===== MANAGER PRO : paramètres et apparence ===== */
+let st="app";
+const UI=(()=>{try{return JSON.parse(localStorage.getItem("gp_ui"))||{}}catch(e){return{}}})();
+function applyUI(){const r=document.documentElement;if(UI.theme&&UI.theme!="auto")r.dataset.theme=UI.theme;else delete r.dataset.theme;r.style.setProperty("--fs",(UI.fs||15)+"px")}
+function setUI(k,v){UI[k]=v;try{localStorage.setItem("gp_ui",JSON.stringify(UI))}catch(e){}applyUI();render()}
+applyUI();
+const sub=h=>h.replace(/<h1>.*?<\/h1>/,"");
+const TS=[["app","Apparence"],["dev","Devise"],["compte","Compte et abonnement"],["roles","Rôles et taux"],["don","Données"],["aide","Aide"]];
+function setBody(){
+ if(st=="app")return`<div class="card"><b>Thème</b><div class="row" style="margin:8px 0 16px">${[["auto","Automatique"],["light","Clair"],["dark","Sombre"]].map(([k,l])=>`<button class="${(UI.theme||"auto")==k?"b":"g"}" onclick="setUI('theme','${k}')">${l}</button>`).join("")}</div><b>Taille du texte</b><div class="row" style="margin-top:8px">${[[15,"Normal"],[17,"Grand"],[19,"Très grand"]].map(([k,l])=>`<button class="${(UI.fs||15)==k?"b":"g"}" onclick="setUI('fs',${k})">${l}</button>`).join("")}</div><p class="mt" style="margin:14px 0 0">« Automatique » suit le réglage clair ou sombre de votre appareil.</p></div>`;
+ if(st=="dev")return`<div class="card"><b>Devise de référence</b><p class="mt" style="margin:6px 0 10px">Tous les totaux sont affichés dans cette devise. Changer de devise modifie l’affichage, pas la valeur des montants déjà saisis : choisissez-la au début.</p><select aria-label="Devise" onchange="setCur(this.value)" style="max-width:100%">${CUR.map(c=>`<option value="${c}"${c==(S.cur||"XAF")?" selected":""}>${c} · ${cn(c)}</option>`).join("")}</select></div>`;
+ if(st=="compte")return sub(V.abo());
+ if(st=="roles")return sub(V.roles());
+ if(st=="don")return`<div class="card"><b>Exporter</b><div class="row" style="margin:8px 0 16px"><button class="g" onclick="exportCSV('tx')">Opérations (CSV)</button><button class="g" onclick="exportCSV('tk')">Tâches (CSV)</button><button class="g" onclick="exportXLSX()">Tout en Excel</button></div>${DEFER?`<b>Installer</b><div class="row" style="margin:8px 0 16px"><button class="b" onclick="installApp()">Installer l’application</button></div>`:""}<b>Zone sensible</b><p class="mt" style="margin:6px 0 10px">Efface tous les projets, tâches, équipes et opérations${USER?" de cet appareil et de votre compte en ligne":" de cet appareil"}.</p><button class="g d" onclick="resetAll()">${dz?"Confirmer : tout effacer":"Tout effacer et repartir à zéro"}</button></div>`;
+ return`<div class="card"><b>Aide et informations</b><p style="margin:10px 0 4px"><a href="confidentialite.html">Politique de confidentialité</a></p><p style="margin:4px 0"><a href="conditions.html">Conditions d’utilisation</a></p>${WHATSAPP?`<p style="margin:4px 0"><a href="https://wa.me/${WHATSAPP.replace(/\D/g,"")}" target="_blank" rel="noopener">Contacter le support sur WhatsApp</a></p>`:""}<p class="mt" style="margin:12px 0 0">Manager Pro · version bêta · build 7 du 25 novembre 2026</p></div>`}
+V.set=()=>`<h1>Paramètres</h1><div class="tabs">${TS.map(([k,l])=>`<button class="${st==k?"on":""}" onclick="st='${k}';render()">${l}</button>`).join("")}</div>`+setBody();
+function render(){const it=[["dash","Tableau de bord"],["fin","Finances"],["proj","Projets"],["team","Équipes"]];
+ $("#nav").innerHTML=`<h3 style="display:flex;align-items:center;gap:10px"><img src="logo.svg" width="38" height="38" alt="">Manager Pro</h3>`+it.map(([k,l])=>`<button class="${view==k?"on":""}" onclick="go('${k}')">${l}</button>`).join("")+`<span class="sp"></span><button class="${view=="set"?"on":""}" onclick="go('set')">Paramètres</button>`;
  $("#main").innerHTML=V[view]();modal()}
+
 render();
 </script></body></html>
