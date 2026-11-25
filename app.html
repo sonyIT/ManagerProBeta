@@ -3,7 +3,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Manager Pro · Finances et projets</title>
 <meta name="description" content="Manager Pro : gérez vos finances et suivez vos projets au même endroit.">
-<meta name="theme-color" content="#0e7c66"><link rel="manifest" href="manifest.json"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
+<meta name="theme-color" content="#0e7c66"><link rel="manifest" href="manifest.json"><link rel="icon" type="image/svg+xml" href="logo.svg"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap">
@@ -225,6 +225,9 @@ V.roles=()=>{const used=new Set(S.teams.flatMap(t=>t.members.map(m=>m.r))),rs=S.
 /* ===== MANAGER PRO : compte en ligne, offre Pro, installation ===== */
 /* À REMPLIR plus tard (voir le guide). Tant que SB_URL est vide, l’application reste en mode local, sans limite. */
 const SB_URL="",SB_KEY="",LIEN_PAIEMENT="",LIMITE_GRATUIT=2;
+/* Paiement. LIEN_PAIEMENT = lien carte bancaire. MOBILE_MONEY = vos numéros. WHATSAPP = numéro avec indicatif pays, chiffres seulement. */
+const PRIX_PRO="6 € par mois",WHATSAPP="",EMAIL_PARAM="";/* EMAIL_PARAM : nom du paramètre qui préremplit l’e-mail dans votre lien de paiement (Stripe : prefilled_email ; Lemon Squeezy : checkout[email]). Laissez vide si vous ne savez pas. */
+const MOBILE_MONEY=[/* {nom:"MTN Mobile Money",numero:"06 000 00 00",titulaire:"Votre nom"},{nom:"Airtel Money",numero:"05 000 00 00",titulaire:"Votre nom"} */];
 let sb=null,USER=null,ORG=null,PLAN="gratuit",tmC,DEFER=null;
 try{if(window.supabase&&SB_URL)sb=supabase.createClient(SB_URL,SB_KEY)}catch(e){}
 const isPro=()=>!sb||PLAN=="pro";
@@ -240,7 +243,7 @@ async function loadCloud(){
  const d=await sb.from("app_state").select("data").eq("organisation_id",ORG).maybeSingle();
  if(d.data&&d.data.data&&d.data.data.roles)S=d.data.data;else saveCloud();
  render()}
-function authUI(msg,mode){mode=mode||"in";box.innerHTML=`<div class="ov" onclick="if(event.target==this)closeAuth()"><div class="md"><div class="row" style="justify-content:space-between"><b style="font-size:18px">${mode=="up"?"Créer un compte":"Se connecter"}</b><button class="g" onclick="closeAuth()">Fermer</button></div>${msg?`<p class="mt">${E(msg)}</p>`:""}<label for="ae">E-mail</label><input id="ae" type="email" autocomplete="email"><label for="ap">Mot de passe (8 caractères minimum)</label><input id="ap" type="password" autocomplete="${mode=="up"?"new-password":"current-password"}"><div class="row" style="margin-top:14px"><button class="b" onclick="doAuth('${mode}')">${mode=="up"?"Créer mon compte":"Me connecter"}</button><button class="g" onclick="authUI('','${mode=="up"?"in":"up"}')">${mode=="up"?"J’ai déjà un compte":"Créer un compte"}</button></div><p class="mt" style="margin-top:12px"><a href="#" onclick="resetPw();return false">Mot de passe oublié ?</a></p></div></div>`}
+function authUI(msg,mode){mode=mode||"in";box.innerHTML=`<div class="ov" onclick="if(event.target==this)closeAuth()"><div class="md"><div class="row" style="justify-content:space-between"><b style="font-size:18px">${mode=="up"?"Créer un compte":"Se connecter"}</b><button class="g" onclick="closeAuth()">Fermer</button></div>${(msg||!sb)?`<p class="mt">${E(msg||"Les comptes en ligne seront bientôt disponibles.")}</p>`:""}<label for="ae">E-mail</label><input id="ae" type="email" autocomplete="email"><label for="ap">Mot de passe (8 caractères minimum)</label><input id="ap" type="password" autocomplete="${mode=="up"?"new-password":"current-password"}"><div class="row" style="margin-top:14px"><button class="b" onclick="doAuth('${mode}')">${mode=="up"?"Créer mon compte":"Me connecter"}</button><button class="g" onclick="authUI('','${mode=="up"?"in":"up"}')">${mode=="up"?"J’ai déjà un compte":"Créer un compte"}</button></div><p class="mt" style="margin-top:12px"><a href="#" onclick="resetPw();return false">Mot de passe oublié ?</a></p></div></div>`}
 async function doAuth(m){if(!sb)return toast("Les comptes ne sont pas encore configurés.");const e=$("#ae").value.trim(),p=$("#ap").value;if(!e||p.length<8)return toast("E-mail et mot de passe de 8 caractères minimum.");
  const r=m=="up"?await sb.auth.signUp({email:e,password:p}):await sb.auth.signInWithPassword({email:e,password:p});
  if(r.error)return toast(r.error.message);
@@ -252,20 +255,42 @@ async function logout(){await sb.auth.signOut();USER=ORG=null;PLAN="gratuit";S=e
 if(sb){sb.auth.getSession().then(async r=>{const s=r.data&&r.data.session;if(s){USER=s.user;await loadCloud()}});
  sb.auth.onAuthStateChange(ev=>{if(ev=="PASSWORD_RECOVERY")box.innerHTML=`<div class="ov"><div class="md"><b style="font-size:18px">Nouveau mot de passe</b><label for="np2">Mot de passe (8 caractères minimum)</label><input id="np2" type="password" autocomplete="new-password"><div class="row" style="margin-top:14px"><button class="b" onclick="newPw()">Enregistrer</button></div></div></div>`})}
 /* Offre gratuite et offre Pro */
+const proOk=()=>!!sb&&PLAN=="pro";
+function goPro(){closeAuth();go("abo")}
 function upsell(msg){box.innerHTML=`<div class="ov" onclick="if(event.target==this)closeAuth()"><div class="md"><b style="font-size:18px">Offre Pro</b><p>${E(msg)}</p><ul><li>Projets illimités</li><li>Export CSV et Excel</li></ul><div class="row"><button class="b" onclick="goPro()">Passer à Pro</button><button class="g" onclick="closeAuth()">Plus tard</button></div></div></div>`}
-function goPro(){if(!USER)return authUI("Créez d’abord un compte : votre offre Pro y sera rattachée.","up");if(!LIEN_PAIEMENT){closeAuth();return toast("Le paiement n’est pas encore configuré.")}window.open(LIEN_PAIEMENT+(LIEN_PAIEMENT.includes("?")?"&":"?")+"checkout[email]="+encodeURIComponent(USER.email),"_blank","noopener")}
+function payCard(){if(!USER)return authUI("Créez d’abord un compte : votre offre Pro y sera rattachée.","up");if(!LIEN_PAIEMENT){closeAuth();return toast("Le paiement n’est pas encore configuré.")}window.open(LIEN_PAIEMENT+(EMAIL_PARAM?(LIEN_PAIEMENT.includes("?")?"&":"?")+EMAIL_PARAM+"="+encodeURIComponent(USER.email):""),"_blank","noopener")}
 const ap0=addP;addP=function(){if(!isPro()&&S.projects.length>=LIMITE_GRATUIT)return upsell("L’offre gratuite est limitée à "+LIMITE_GRATUIT+" projets.");ap0()};
 const ec0=exportCSV,ex0=exportXLSX;
 exportCSV=function(k){if(!isPro())return upsell("L’export est réservé à l’offre Pro.");ec0(k)};
 exportXLSX=function(){if(!isPro())return upsell("L’export est réservé à l’offre Pro.");ex0()};
+
+/* Page « Compte et abonnement » */
+V.abo=()=>{const pro=proOk(),wa=WHATSAPP.replace(/\D/g,""),mm=MOBILE_MONEY.length,none=!LIEN_PAIEMENT&&!mm,btn="display:inline-block;background:var(--pr);color:#fff;text-decoration:none;padding:8px 13px;border-radius:8px";
+ return`<h1>Compte et abonnement</h1><div class="card"><b>Mon compte</b>${USER?`<p>Connecté : ${E(USER.email)}</p><button class="g" onclick="logout()">Se déconnecter</button>`:`<p class="mt">Créez un compte pour sauvegarder vos projets en ligne et les retrouver sur tous vos appareils.</p><div class="row"><button class="b" onclick="authUI('','up')">Créer un compte</button><button class="g" onclick="authUI('','in')">Se connecter</button></div>${sb?"":`<p class="mt" style="margin:8px 0 0">Les comptes en ligne seront bientôt disponibles. En attendant, vos données restent sur cet appareil.</p>`}`}</div>
+<h2>Offres</h2><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px"><div class="card"><b>Gratuit</b> ${sb&&!pro?`<span class="tag">Votre offre</span>`:""}<p class="mt" style="margin:6px 0">${LIMITE_GRATUIT} projets, finances, tâches, Gantt, équipes.</p></div><div class="card"><b>Pro · ${E(PRIX_PRO)}</b> ${pro?`<span class="tag">Votre offre</span>`:""}<p class="mt" style="margin:6px 0">Projets illimités, export CSV et Excel.</p></div></div>
+${pro?"":`<h2>Payer l’offre Pro</h2><div class="card">${USER?"":`<p class="mt" style="margin-top:0">Créez d’abord un compte : l’offre Pro sera rattachée à votre e-mail.</p>`}${LIEN_PAIEMENT?`<div class="row" style="margin-bottom:10px"><button class="b" onclick="payCard()">Payer par carte bancaire</button><span class="mt">Offre Pro activée sous 24 heures après le paiement.</span></div>`:""}${mm?`<p style="margin:10px 0 6px"><b>Par Mobile Money</b></p>${MOBILE_MONEY.map(m=>`<div style="margin:4px 0">${E(m.nom)} : <b>${E(m.numero)}</b> <span class="mt">(${E(m.titulaire)})</span></div>`).join("")}<ol class="mt"><li>Envoyez ${E(PRIX_PRO)} à l’un de ces numéros.</li><li>Envoyez la preuve (capture ou code de la transaction) avec l’e-mail de votre compte.</li><li>Votre offre Pro est activée sous 24 heures.</li></ol>${wa?`<a style="${btn}" href="https://wa.me/${wa}?text=${encodeURIComponent("Bonjour, je souhaite activer l’offre Pro de Manager Pro. Mon e-mail : "+(USER?USER.email:""))}" target="_blank" rel="noopener">Envoyer la preuve sur WhatsApp</a>`:""}`:""}${none?`<p class="mt" style="margin:0">Le paiement sera bientôt disponible.</p>`:""}</div>`}`};
 /* Application installable (PWA) et barre latérale */
 addEventListener("beforeinstallprompt",e=>{e.preventDefault();DEFER=e;render()});
 function installApp(){if(!DEFER)return;DEFER.prompt();DEFER=null;render()}
 if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
-const rn0=render;render=function(){rn0();$("#nav").insertAdjacentHTML("beforeend",`<div style="margin-top:10px;font-size:12px;opacity:.8;padding:0 10px">${USER?E(USER.email)+" · "+(isPro()?"Offre Pro":"Offre gratuite"):"Mode local (non connecté)"}</div>${!sb?"":USER?`<button onclick="logout()">Se déconnecter</button>`:`<button onclick="authUI('','in')">Se connecter</button>`}${isPro()?"":`<button onclick="upsell('Passez à l’offre Pro pour lever les limites.')">Passer à Pro</button>`}${DEFER?`<button onclick="installApp()">Installer l’application</button>`:""}<div style="font-size:12px;padding:6px 10px;opacity:.7"><a href="confidentialite.html" style="color:inherit">Confidentialité</a> · <a href="conditions.html" style="color:inherit">Conditions</a></div>`)};
+const rn0=render;render=function(){rn0();$("#nav").insertAdjacentHTML("beforeend",`<div style="margin-top:10px;font-size:12px;opacity:.8;padding:0 10px">${USER?E(USER.email)+" · "+(isPro()?"Offre Pro":"Offre gratuite"):"Mode local (non connecté)"}</div>${USER?`<button onclick="logout()">Se déconnecter</button>`:`<button onclick="authUI('','in')">Se connecter</button>`}${DEFER?`<button onclick="installApp()">Installer l’application</button>`:""}<div style="font-size:12px;padding:6px 10px;opacity:.7"><a href="confidentialite.html" style="color:inherit">Confidentialité</a> · <a href="conditions.html" style="color:inherit">Conditions</a></div>`)};
 /* ===== FIN DU BLOC ===== */
 
-function render(){const it=[["dash","Tableau de bord"],["fin","Finances"],["proj","Projets"],["team","Équipes"],["roles","Rôles"]];
+/* ===== MANAGER PRO : assistant intégré ===== */
+/* Collez l'adresse de votre assistant entre les guillemets. Vide = bouton masqué. */
+const ASSISTANT_URL="";
+(function(){if(!ASSISTANT_URL)return;
+ const st=document.createElement("style");st.textContent="#asb{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));width:60px;height:60px;border-radius:50%;border:1px solid var(--bd);padding:0;cursor:pointer;background:var(--sf);box-shadow:0 6px 18px #0004;z-index:40;display:flex;align-items:center;justify-content:center}#asb img{width:42px;height:42px}#asp{position:fixed;right:18px;bottom:calc(88px + env(safe-area-inset-bottom,0px));width:400px;height:min(640px,calc(100% - 120px));background:var(--sf);color:var(--tx);border:1px solid var(--bd);border-radius:14px;box-shadow:0 10px 34px #0005;z-index:41;display:none;flex-direction:column;overflow:hidden}#asp.on{display:flex}#asp header{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;font-weight:600;border-bottom:1px solid var(--bd)}#asp header button{border:0;background:none;color:inherit;font-size:24px;cursor:pointer}#asp iframe{flex:1;border:0;width:100%;background:#fff}@media (max-width:760px){#asb{bottom:calc(76px + env(safe-area-inset-bottom,0px))}#asp{inset:0;width:auto;height:auto;border-radius:0}}";
+ document.head.appendChild(st);
+ const b=document.createElement("button");b.id="asb";b.title="Assistant Manager Pro";b.setAttribute("aria-label","Ouvrir l’assistant");b.innerHTML='<img src="logo.svg" alt="">';
+ const p=document.createElement("div");p.id="asp";p.innerHTML='<header><span>Assistant Manager Pro</span><button aria-label="Fermer">×</button></header>';
+ let f=null;
+ b.onclick=()=>{p.classList.toggle("on");if(p.classList.contains("on")&&!f){f=document.createElement("iframe");f.src=ASSISTANT_URL;f.title="Assistant Manager Pro";f.allow="clipboard-write";p.appendChild(f)}};
+ p.querySelector("button").onclick=()=>p.classList.remove("on");
+ document.body.appendChild(b);document.body.appendChild(p)})();
+/* ===== FIN DU BLOC ===== */
+
+function render(){const it=[["dash","Tableau de bord"],["fin","Finances"],["proj","Projets"],["team","Équipes"],["roles","Rôles"],["abo","Compte et abonnement"]];
  $("#nav").innerHTML=`<h3 style="display:flex;align-items:center;gap:10px"><img src="logo.svg" width="38" height="38" alt="">Manager Pro</h3>`+it.map(([k,l])=>`<button class="${view==k?"on":""}" onclick="go('${k}')">${l}</button>`).join("")+`<span class="sp"></span><select style="margin-bottom:8px" onchange="setCur(this.value)" aria-label="Devise">${CUR.map(c=>`<option value="${c}"${c==(S.cur||"XAF")?" selected":""}>${c} · ${cn(c)}</option>`).join("")}</select><button onclick="theme()">Mode clair ou sombre</button>`;
  $("#main").innerHTML=V[view]();modal()}
 render();
