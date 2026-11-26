@@ -4,7 +4,7 @@
 <title>Manager Pro · Finances et projets</title>
 <meta name="description" content="Manager Pro : gérez vos finances et suivez vos projets au même endroit.">
 <meta name="theme-color" content="#0e7c66"><link rel="manifest" href="manifest.json"><link rel="icon" type="image/svg+xml" href="logo.svg"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap">
 <style>
@@ -303,7 +303,7 @@ function setBody(){
  if(st=="compte")return sub(V.abo());
  if(st=="roles")return sub(V.roles());
  if(st=="don")return`<div class="card"><b>Exporter</b><div class="row" style="margin:8px 0 16px"><button class="g" onclick="exportCSV('tx')">Opérations (CSV)</button><button class="g" onclick="exportCSV('tk')">Tâches (CSV)</button><button class="g" onclick="exportXLSX()">Tout en Excel</button></div>${DEFER?`<b>Installer</b><div class="row" style="margin:8px 0 16px"><button class="b" onclick="installApp()">Installer l’application</button></div>`:""}<b>Zone sensible</b><p class="mt" style="margin:6px 0 10px">Efface tous les projets, tâches, équipes et opérations${USER?" de cet appareil et de votre compte en ligne":" de cet appareil"}.</p><button class="g d" onclick="resetAll()">${dz?"Confirmer : tout effacer":"Tout effacer et repartir à zéro"}</button></div>`;
- return`<div class="card"><b>Aide et informations</b><p style="margin:10px 0 4px"><a href="confidentialite.html">Politique de confidentialité</a></p><p style="margin:4px 0"><a href="conditions.html">Conditions d’utilisation</a></p>${WHATSAPP?`<p style="margin:4px 0"><a href="https://wa.me/${WHATSAPP.replace(/\D/g,"")}" target="_blank" rel="noopener">Contacter le support sur WhatsApp</a></p>`:""}<p class="mt" style="margin:12px 0 0">Manager Pro · version bêta · build 7 du 25 novembre 2026</p></div>`}
+ return`<div class="card"><b>Aide et informations</b><p style="margin:10px 0 4px"><a href="confidentialite.html">Politique de confidentialité</a></p><p style="margin:4px 0"><a href="conditions.html">Conditions d’utilisation</a></p>${WHATSAPP?`<p style="margin:4px 0"><a href="https://wa.me/${WHATSAPP.replace(/\D/g,"")}" target="_blank" rel="noopener">Contacter le support sur WhatsApp</a></p>`:""}<p class="mt" style="margin:12px 0 0">Manager Pro · version bêta · build 8 du 25 novembre 2026</p></div>`}
 V.set=()=>`<h1>Paramètres</h1><div class="tabs">${TS.map(([k,l])=>`<button class="${st==k?"on":""}" onclick="st='${k}';render()">${l}</button>`).join("")}</div>`+setBody();
 function render(){const it=[["dash","Tableau de bord"],["fin","Finances"],["proj","Projets"],["team","Équipes"]];
  $("#nav").innerHTML=`<h3 style="display:flex;align-items:center;gap:10px"><img src="logo.svg" width="38" height="38" alt="">Manager Pro</h3>`+it.map(([k,l])=>`<button class="${view==k?"on":""}" onclick="go('${k}')">${l}</button>`).join("")+`<span class="sp"></span><button class="${view=="set"?"on":""}" onclick="go('set')">Paramètres</button>`;
