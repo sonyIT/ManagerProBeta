@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Manager Pro · Finances et projets</title>
+<meta name="description" content="Manager Pro : gérez vos finances et suivez vos projets au même endroit.">
+<meta name="theme-color" content="#0e7c66"><link rel="manifest" href="manifest.json"><link rel="icon" type="image/svg+xml" href="logo.svg"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light;--bg:#edf2f0;--sf:#fff;--tx:#0a1411;--mt:#3f4f4a;--bd:#bccac5;--pr:#0a6652;--onpr:#fff;--prt:#064a3b;--pr2:#d3ece4;--ok:#0a6652;--ko:#b3261e;--wn:#8f5200;--nv:#0f1d1a;--nt:#f3f8f6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0a1110;--sf:#131c19;--tx:#f3f8f6;--mt:#b9c8c2;--bd:#374844;--pr:#3fd0ae;--onpr:#04211a;--prt:#8fe8d1;--pr2:#173b32;--ok:#4be0b8;--ko:#ff8f82;--wn:#f7bd5e;--nv:#070d0c;--nt:#f3f8f6}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0a1110;--sf:#131c19;--tx:#f3f8f6;--mt:#b9c8c2;--bd:#374844;--pr:#3fd0ae;--onpr:#04211a;--prt:#8fe8d1;--pr2:#173b32;--ok:#4be0b8;--ko:#ff8f82;--wn:#f7bd5e;--nv:#070d0c;--nt:#f3f8f6}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;height:100%;background:var(--bg);color:var(--tx);font:var(--fs,15px)/1.5 Manrope,system-ui,-apple-system,"Segoe UI",sans-serif}
+.app{display:flex;height:100%}
+nav{width:210px;flex:none;background:var(--nv);color:var(--nt);padding:18px 12px;display:flex;flex-direction:column;gap:4px}
+nav h3{margin:0 8px 14px;font-size:18px;font-weight:800}
+nav button{background:none;border:0;color:inherit;text-align:left;padding:9px 10px;border-radius:8px;font:inherit;cursor:pointer;opacity:.92}
+nav button.on{background:var(--pr);color:var(--onpr);opacity:1;font-weight:600}
+nav .sp{flex:1}
+main{flex:1;overflow:auto;padding:22px;min-width:0}
+h1{margin:0 0 16px;font-size:26px;font-weight:800}h2{font-size:17px;margin:22px 0 10px}
+.kp{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.k{padding:4px 0 4px 12px;border-left:4px solid var(--bd)}.k.ok{border-color:var(--ok)}.k.ko{border-color:var(--ko)}.k.wn{border-color:var(--wn)}
+.k small{color:var(--mt);display:block}.k b{font-size:22px}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+input,select,textarea{font:inherit;color:inherit;background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:8px 10px;min-width:0}
+input:disabled,select:disabled,textarea:disabled{opacity:.8;background:var(--bg)}
+label{display:block;font-size:13px;color:var(--mt);margin:10px 0 3px}
+button.b,button.g{font:inherit;border-radius:8px;padding:8px 13px;cursor:pointer;border:1px solid var(--pr)}
+button.b{background:var(--pr);color:var(--onpr)}button.g{background:none;color:var(--pr)}button.d{border-color:var(--ko);color:var(--ko)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--pr);outline-offset:2px}
+.bar{height:8px;background:var(--bd);border-radius:4px;overflow:hidden;margin:6px 0}.bar i{display:block;height:100%;background:var(--pr)}.bar i.ko{background:var(--ko)}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--bd);vertical-align:top}th{color:var(--mt);font-weight:600;font-size:13px}
+.tw{overflow-x:auto}.mt{color:var(--mt)}.ok{color:var(--ok)}.ko{color:var(--ko)}
+.tag{display:inline-block;padding:1px 9px;border-radius:99px;background:var(--pr2);color:var(--prt);font-size:13px;margin:2px 4px 2px 0}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;margin:8px 0}.tabs button{border:0;background:none;color:var(--mt);font:inherit;padding:6px 11px;border-radius:99px;cursor:pointer}.tabs button.on{background:var(--pr2);color:var(--prt);font-weight:600}
+.kb{display:grid;grid-template-columns:repeat(3,minmax(200px,1fr));gap:10px;overflow-x:auto}
+.col{background:var(--pr2);border-radius:10px;padding:8px;min-height:120px}.col h4{margin:2px 4px 8px}
+.tk{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:9px;margin-bottom:8px;cursor:pointer}
+.gt{overflow-x:auto;background:var(--sf);border:1px solid var(--bd);border-radius:10px}
+.gr{display:flex;height:38px;border-bottom:1px solid var(--bd)}
+.gl{position:sticky;left:0;width:190px;flex:none;background:var(--sf);z-index:2;padding:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-right:1px solid var(--bd);cursor:pointer}
+.gc{position:relative;flex:none}.gh .gc span{position:absolute;top:10px;font-size:11px;color:var(--mt)}
+.gb{position:absolute;top:8px;height:22px;border-radius:6px;background:var(--mt);cursor:pointer;overflow:hidden;opacity:.9}.gb i{display:block;height:100%;background:rgba(255,255,255,.45)}.gb.s1{background:var(--pr)}.gb.s2{background:var(--ok);opacity:.6}
+.td{position:absolute;top:0;bottom:0;width:2px;background:var(--ko)}
+.ov{position:fixed;inset:0;background:#0008;display:flex;align-items:center;justify-content:center;padding:12px;z-index:50}
+.md{background:var(--sf);border-radius:14px;max-width:560px;width:100%;max-height:92%;overflow:auto;padding:18px}
+.md input,.md select,.md textarea{width:100%}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:24px;background:var(--tx);color:var(--bg);padding:9px 16px;border-radius:99px;z-index:99;display:none}
+@media (max-width:760px){.app{flex-direction:column-reverse}nav{width:auto;flex-direction:row;overflow-x:auto;padding:6px}nav h3,nav .sp,nav .chip .cn{display:none}nav button{white-space:nowrap}main{padding:14px}.kb{grid-template-columns:repeat(3,230px)}}
+nav .chip{display:flex;align-items:center;gap:10px;overflow:hidden}nav .chip .cn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}select option{background:var(--sf);color:var(--tx)}a{color:var(--prt)}::placeholder{color:var(--mt);opacity:.85}.card b,.md b{color:var(--tx)}</style><script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script></head><body>
+<div class="app"><nav id="nav"></nav><main id="main"></main></div>
+<div id="modal"></div><div id="toast"></div>
+<script>
+const $=s=>document.querySelector(s),E=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const iso=n=>{const d=new Date();d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)};
+const M=n=>{try{return new Intl.NumberFormat("fr-FR",{style:"currency",currency:S.cur||"XAF"}).format(n)}catch(e){return n+" "+(S.cur||"")}};
+const day=s=>Date.UTC(+s.slice(0,4),+s.slice(5,7)-1,+s.slice(8,10))/864e5;
+const ST=["À faire","En cours","Terminé"],PR=["Basse","Normale","Haute"],ACC=["Lecteur","Membre","Gestionnaire"];
+const nid=()=>Date.now()+Math.floor(Math.random()*999);
+const PRE={"Accès à l’application":["Administrateur","Gestionnaire financier","Chef de projet","Membre","Lecteur"],"Encadrement de projet":["Directeur de projet","Conducteur de travaux","Chef de chantier","Responsable sécurité"],"Technique et ouvriers":["Ingénieur","Technicien","Contremaître","Maçon","Électricien","Plombier","Soudeur","Chauffeur d’engins","Ouvrier","Manœuvre"],"Support et administration":["Comptable","Acheteur","Magasinier"],"Intervenants externes":["Client","Sous-traitant","Fournisseur"]};
+function seed(){
+ const roles=[];Object.keys(PRE).forEach(c=>PRE[c].forEach(n=>roles.push({id:"p"+roles.length,name:n,cat:c,custom:false})));
+ const rid=n=>roles.find(r=>r.name==n).id;
+ const T=(pid,tid,title,s,e,st,pg,who,b,c)=>({id:nid()+Math.random(),pid,tid,title,desc:"",status:st,prio:1,start:iso(s),end:iso(e),progress:pg,assignee:who,budget:b,cost:c,log:[]});
+ return{roles,projects:[{id:1,name:"Résidence A",budget:12000000},{id:2,name:"Site web client",budget:3000000}],
+ teams:[{id:1,name:"Maçonnerie",pid:1,members:[{n:"Jean M.",r:rid("Chef de chantier")},{n:"Paul K.",r:rid("Maçon")},{n:"Didier B.",r:rid("Manœuvre")}]},{id:2,name:"Maçonnerie",pid:2,members:[]},{id:3,name:"Design",pid:2,members:[{n:"Grâce L.",r:rid("Technicien")}]}],
+ tasks:[T(1,1,"Terrassement",-10,-3,2,100,"Jean M.",900000,850000),T(1,1,"Fondations",-4,8,1,60,"Paul K.",2500000,1500000),T(1,1,"Élévation des murs",6,24,0,0,"Jean M.",3500000,0),T(1,0,"Électricité",18,30,0,0,"",1800000,0),T(1,0,"Finitions",28,40,0,0,"",2200000,0),T(2,3,"Maquettes",-5,4,1,50,"Grâce L.",600000,300000),T(2,3,"Développement",5,25,0,0,"",1800000,0)],
+ tx:[{id:1,label:"Acompte client",amt:6000000,type:"rev",pid:1,date:iso(-12)},{id:2,label:"Achat de ciment",amt:850000,type:"dep",pid:1,date:iso(-9)},{id:3,label:"Main-d’œuvre maçonnerie",amt:1200000,type:"dep",pid:1,date:iso(-3)},{id:4,label:"Acompte maquettes",amt:1000000,type:"rev",pid:2,date:iso(-6)},{id:5,label:"Hébergement et outils",amt:60000,type:"dep",pid:2,date:iso(-2)},{id:6,label:"Loyer du bureau",amt:300000,type:"dep",pid:0,date:iso(-1)}]}}
+let S=(()=>{try{return JSON.parse(localStorage.getItem("gp3"))}catch(e){return null}})()||empty();
+function empty(){const s=seed();s.projects=[];s.teams=[];s.tasks=[];s.tx=[];return s}
+const save=()=>{try{localStorage.setItem("gp3",JSON.stringify(S))}catch(e){};if(window.saveCloud)saveCloud()};
+let view="dash",cp=0,pv="gantt",tf="",et=0,mt=0,mtab="Détails",me=false,dr=0;
+const P=id=>S.projects.find(p=>p.id==id)||{name:"Sans projet",budget:0},Rn=id=>(S.roles.find(r=>r.id==id)||{name:"—"}).name;
+const same=(a,b)=>String(a)===String(b);
+const opt=(arr,sel)=>arr.map(([v,l])=>`<option value="${E(v)}"${same(v,sel)?" selected":""}>${E(l)}</option>`).join("");
+const pOpts=sel=>opt(S.projects.map(p=>[p.id,p.name]),sel);
+const sum=(a,f)=>a.reduce((x,y)=>x+f(y),0);
+const spent=p=>sum(S.tx.filter(t=>t.pid==p&&t.type=="dep"),t=>t.amt),inc=p=>sum(S.tx.filter(t=>t.pid==p&&t.type=="rev"),t=>t.amt);
+function toast(m){const t=$("#toast");t.textContent=m;t.style.display="block";clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display="none",2600)}
+function go(v){view=v;dz=0;render()}
+const CUR=(()=>{try{return Intl.supportedValuesOf("currency")}catch(e){return["XAF","XOF","EUR","USD","GBP","CAD","CDF","MAD","NGN","GHS","ZAR","CNY","JPY"]}})();
+const cn=c=>{try{return new Intl.DisplayNames("fr",{type:"currency"}).of(c)}catch(e){return c}};
+function setCur(c){S.cur=c;save();render()}
+function theme(){const r=document.documentElement,d=r.dataset.theme?r.dataset.theme=="dark":matchMedia("(prefers-color-scheme:dark)").matches;r.dataset.theme=d?"light":"dark"}
+function ensureRole(name,cat,acc,rate){name=name.trim();let r=S.roles.find(x=>x.name.toLowerCase()==name.toLowerCase());if(!r){r={id:"c"+nid(),name,cat:cat||"Personnalisé",custom:true,acc:acc||"Membre",rate:+rate||0};S.roles.push(r)}return r.id}
+const V={};
+const kp=(l,v,c)=>`<div class="k ${c||""}"><small>${l}</small><b>${v}</b></div>`;
+V.dash=()=>{const r=sum(S.tx.filter(t=>t.type=="rev"),t=>t.amt),d=sum(S.tx.filter(t=>t.type=="dep"),t=>t.amt),late=S.tasks.filter(t=>t.status<2&&t.end<iso(0)).length;
+ return`<h1>Tableau de bord</h1><div class="kp">${kp("Solde",M(r-d),r-d>=0?"ok":"ko")}${kp("Revenus",M(r),"ok")}${kp("Dépenses",M(d),"ko")}${kp("Tâches en retard",late,late?"wn":"")}</div><h2>Budget et rentabilité par projet</h2>`+
+ S.projects.map(p=>{const s=spent(p.id),i=inc(p.id),ts=S.tasks.filter(t=>t.pid==p.id),av=ts.length?Math.round(sum(ts,t=>t.progress)/ts.length):0,pc=p.budget?s/p.budget*100:0;
+ return`<div class="card"><div class="row"><b>${E(p.name)}</b><span class="mt">avancement ${av} %</span></div><div class="bar"><i class="${pc>100?"ko":""}" style="width:${Math.min(100,pc)}%"></i></div><div class="row mt">Dépensé ${M(s)} sur ${M(p.budget)} (reste ${M(p.budget-s)})</div><div>Résultat du projet : <b class="${i-s>=0?"ok":"ko"}">${M(i-s)}</b></div></div>`}).join("")};
+V.fin=()=>`<h1>Finances</h1><div class="card"><div class="row"><input id="xl" placeholder="Libellé"><input id="xa" type="number" min="0" placeholder="Montant"><select id="xt"><option value="dep">Dépense</option><option value="rev">Revenu</option></select><select id="xp"><option value="0">Sans projet</option>${pOpts("")}</select><input id="xd" type="date" value="${iso(0)}"><button class="b" onclick="addTx()">Ajouter l’opération</button></div></div><div class="card tw"><table><tr><th>Date</th><th>Libellé</th><th>Projet</th><th>Montant</th><th></th></tr>${[...S.tx].sort((a,b)=>b.date.localeCompare(a.date)).map(t=>`<tr><td>${t.date}</td><td>${E(t.label)}</td><td>${E(P(t.pid).name)}</td><td class="${t.type=="rev"?"ok":"ko"}">${t.type=="rev"?"+":"−"} ${M(t.amt)}</td><td><button class="g d" onclick="delTx(${t.id})">Supprimer</button></td></tr>`).join("")}</table></div>`;
+function addTx(){const l=$("#xl").value.trim(),a=+$("#xa").value;if(!l||!(a>0))return toast("Saisissez un libellé et un montant supérieur à 0.");S.tx.push({id:nid(),label:l,amt:a,type:$("#xt").value,pid:+$("#xp").value,date:$("#xd").value||iso(0)});save();render();toast("Opération ajoutée.")}
+function delTx(id){S.tx=S.tx.filter(t=>t.id!=id);save();render()}
+function gantt(ts){if(!ts.length)return`<div class="card mt">Aucune tâche. Ajoutez-en une pour voir le diagramme.</div>`;
+ const a=Math.min(...ts.map(t=>day(t.start)))-1,b=Math.max(...ts.map(t=>day(t.end)))+2,pd=26,w=(b-a+1)*pd,td=day(iso(0));
+ const tdl=td>=a&&td<=b?`<div class="td" style="left:${(td-a)*pd}px"></div>`:"";let h="";
+ for(let i=0;i<=b-a;i+=7)h+=`<span style="left:${i*pd+2}px">${new Date((a+i)*864e5).toLocaleDateString("fr-FR",{day:"2-digit",month:"short",timeZone:"UTC"})}</span>`;
+ return`<div class="gt"><div style="width:${w+190}px"><div class="gr gh"><div class="gl mt">Tâche</div><div class="gc" style="width:${w}px">${h}${tdl}</div></div>`+ts.map(t=>`<div class="gr"><div class="gl" onclick="openT(${t.id})" title="${E(t.title)}">${E(t.title)}</div><div class="gc" style="width:${w}px">${tdl}<div class="gb s${t.status}" onclick="openT(${t.id})" style="left:${(day(t.start)-a)*pd}px;width:${(day(t.end)-day(t.start)+1)*pd}px" title="${E(t.title)} · ${t.progress} %"><i style="width:${t.progress}%"></i></div></div></div>`).join("")+`</div></div><p class="mt">Barre claire : avancement. Ligne rouge : aujourd’hui. Cliquez une barre pour modifier la tâche.</p>`}
+function kanban(ts){return`<div class="kb">${ST.map((s,i)=>`<div class="col" ondragover="event.preventDefault()" ondrop="mv(${i})"><h4>${s} (${ts.filter(t=>t.status==i).length})</h4>${ts.filter(t=>t.status==i).map(t=>`<div class="tk" draggable="true" ondragstart="dr=${t.id}" onclick="openT(${t.id})"><b>${E(t.title)}</b><div class="mt">${E(t.assignee||"Non assignée")} · fin ${t.end}</div><div class="bar"><i style="width:${t.progress}%"></i></div></div>`).join("")}</div>`).join("")}</div>`}
+function mv(s){const t=S.tasks.find(x=>x.id==dr);if(t&&t.status!=s){t.log.unshift({d:new Date().toLocaleString("fr-FR"),t:"Détails",m:`Statut : ${ST[t.status]} → ${ST[s]}`});t.status=s;if(s==2)t.progress=100;save();render()}}
+function list(ts){return`<div class="card tw"><table><tr><th>Tâche</th><th>Équipe</th><th>Responsable</th><th>Statut</th><th>Dates</th><th>%</th><th></th></tr>${ts.map(t=>{const q=S.teams.find(x=>x.id==t.tid);return`<tr><td>${E(t.title)}</td><td>${q?E(q.name+" · "+P(q.pid).name):"—"}</td><td>${E(t.assignee||"—")}</td><td>${ST[t.status]}</td><td>${t.start} → ${t.end}</td><td>${t.progress}</td><td><button class="g" onclick="openT(${t.id})">Modifier</button></td></tr>`}).join("")}</table></div>`}
+V.proj=()=>{if(!P(cp).id)cp=S.projects[0]&&S.projects[0].id;const ts=S.tasks.filter(t=>t.pid==cp).sort((a,b)=>a.start.localeCompare(b.start));
+ return`<h1>Projets</h1><div class="row"><div class="tabs">${S.projects.map(p=>`<button class="${p.id==cp?"on":""}" onclick="cp=${p.id};render()">${E(p.name)}</button>`).join("")}</div><input id="np" placeholder="Nouveau projet" style="width:150px"><input id="nb" type="number" step="any" placeholder="Budget" style="width:110px"><button class="g" onclick="addP()">Créer</button></div>
+ <div class="row" style="justify-content:space-between"><div class="tabs">${[["gantt","Diagramme de Gantt"],["kanban","Kanban"],["list","Liste"]].map(([k,l])=>`<button class="${pv==k?"on":""}" onclick="pv='${k}';render()">${l}</button>`).join("")}</div><span><button class="b" onclick="newT()">Ajouter une tâche</button> <button class="g d" onclick="delP()">${dc==cp?"Confirmer la suppression":"Supprimer le projet"}</button></span></div>${pv=="gantt"?gantt(ts):pv=="kanban"?kanban(ts):list(ts)}`};
+function addP(){const n=$("#np").value.trim();if(!n)return toast("Donnez un nom au projet.");const p={id:nid(),name:n,budget:+$("#nb").value||0};S.projects.push(p);cp=p.id;save();render()}
+function newT(){const t={id:nid(),pid:cp,tid:0,title:"Nouvelle tâche",desc:"",status:0,prio:1,start:iso(0),end:iso(7),progress:0,assignee:"",budget:0,cost:0,log:[]};S.tasks.push(t);save();openT(t.id,true)}
+const TABS={"Détails":[["title","Titre","text"],["desc","Description","area"],["status","Statut","sel",ST],["prio","Priorité","sel",PR]],"Assignation":[["tid","Équipe du projet","team"],["assignee","Responsable","text"]],"Planning":[["start","Date de début","date"],["end","Date de fin","date"],["progress","Avancement (%)","num"]],"Budget":[["budget","Budget prévu","num"],["cost","Coût réel","num"]],"Historique":[]};
+function openT(id,edit){mt=id;me=!!edit;mtab="Détails";modal()}
+function setTab(t){mtab=t;me=false;modal()}
+function modal(){const t=S.tasks.find(x=>x.id==mt);if(!t){$("#modal").innerHTML="";return}const fs=TABS[mtab],dis=me?"":"disabled";
+ const f=fs.map(([k,l,ty,o])=>{const v=t[k],id="f_"+k;let c;
+  if(ty=="area")c=`<textarea id="${id}" rows="3" ${dis}>${E(v)}</textarea>`;
+  else if(ty=="sel")c=`<select id="${id}" ${dis}>${opt(o.map((x,i)=>[i,x]),v)}</select>`;
+  else if(ty=="team")c=`<select id="${id}" ${dis}><option value="0">Aucune</option>${opt(S.teams.filter(q=>q.pid==t.pid).map(q=>[q.id,q.name+" · "+P(q.pid).name]),v)}</select>`;
+  else c=`<input id="${id}" type="${ty=="num"?"number":ty}" step="any" value="${E(v)}" ${dis}>`;return`<label for="${id}">${l}</label>${c}`}).join("");
+ const hist=mtab=="Historique"?(t.log.length?t.log.map(h=>`<div class="mt">${E(h.d)} · ${E(h.t)} : ${E(h.m)}</div>`).join(""):`<p class="mt">Aucune modification enregistrée.</p>`):"";
+ $("#modal").innerHTML=`<div class="ov" onclick="if(event.target==this)closeT()"><div class="md"><div class="row" style="justify-content:space-between"><b style="font-size:18px">${E(t.title)}</b><button class="g" onclick="closeT()">Fermer</button></div><div class="tabs">${Object.keys(TABS).map(k=>`<button class="${k==mtab?"on":""}" onclick="setTab('${k}')">${k}</button>`).join("")}</div>${f}${hist}${mtab=="Historique"?"":`<div class="row" style="margin-top:14px">${me?`<button class="b" onclick="saveT()">Enregistrer</button><button class="g" onclick="me=false;modal()">Annuler</button>`:`<button class="b" onclick="me=true;modal()">Modifier cet onglet</button>`}<span style="flex:1"></span><button class="g d" onclick="delT()">Supprimer la tâche</button></div>`}</div></div>`}
+function saveT(){const t=S.tasks.find(x=>x.id==mt),nv={};
+ TABS[mtab].forEach(([k,l,ty])=>{let v=$("#f_"+k).value;if(ty=="sel"||ty=="team"||ty=="num")v=+v;nv[k]=v});
+ if(nv.title!==undefined&&!nv.title.trim())return toast("Le titre est obligatoire.");
+ const s=nv.start||t.start,e=nv.end||t.end;if(e<s)return toast("La date de fin doit suivre la date de début.");
+ if(nv.progress!==undefined)nv.progress=Math.max(0,Math.min(100,nv.progress));
+ TABS[mtab].forEach(([k,l])=>{if(nv[k]!==t[k]){t.log.unshift({d:new Date().toLocaleString("fr-FR"),t:mtab,m:l+" modifié"});t[k]=nv[k]}});
+ me=false;save();modal();render();toast("Onglet enregistré.")}
+function closeT(){mt=0;me=false;modal()}
+function delT(){S.tasks=S.tasks.filter(t=>t.id!=mt);save();closeT();render();toast("Tâche supprimée.")}
+V.team=()=>{const ps=S.projects.filter(p=>!tf||p.id==tf);
+ return`<h1>Équipes</h1><div class="card"><div class="row"><select id="tp">${pOpts(cp)}</select><input id="tn" placeholder="Nom de l’équipe (ex. Maçonnerie)"><button class="b" onclick="addTeam()">Créer l’équipe</button></div><p class="mt" style="margin:8px 0 0">Le projet est obligatoire : son nom s’ajoute à celui de l’équipe pour éviter les confusions.</p></div>
+ <div class="row"><span class="mt">Filtrer par projet</span><select onchange="tf=this.value;render()"><option value="">Tous les projets</option>${pOpts(tf)}</select></div>`+
+ ps.map(p=>`<h2>${E(p.name)}</h2>`+(S.teams.filter(t=>t.pid==p.id).map(t=>teamCard(t,p)).join("")||`<p class="mt">Aucune équipe sur ce projet.</p>`)).join("")};
+function teamCard(t,p){const ed=et==t.id;
+ return`<div class="card"><div class="row" style="justify-content:space-between">${ed?`<input id="en${t.id}" value="${E(t.name)}"><select id="ep${t.id}">${pOpts(t.pid)}</select>`:`<b>${E(t.name)} · ${E(p.name)}</b>`}<span>${ed?`<button class="b" onclick="saveTeam(${t.id})">Enregistrer</button> <button class="g" onclick="et=0;render()">Annuler</button>`:`<button class="g" onclick="et=${t.id};render()">Modifier</button> <button class="g d" onclick="delTeam(${t.id})">Supprimer</button>`}</span></div>
+ <div style="margin:8px 0">${t.members.map((m,i)=>`<span class="tag">${E(m.n)} · ${E(Rn(m.r))} <a href="#" onclick="rmM(${t.id},${i});return false" style="color:inherit" aria-label="Retirer">×</a></span>`).join("")||`<span class="mt">Aucun membre.</span>`}</div>
+ <div class="row"><input id="mn${t.id}" placeholder="Nom du membre" style="width:150px"><select id="mr${t.id}">${rOpts()}</select><input id="mx${t.id}" placeholder="ou saisir un nouveau rôle" style="width:190px"><button class="g" onclick="addM(${t.id})">Ajouter le membre</button></div></div>`}
+function rOpts(){return Object.keys(PRE).concat(["Personnalisé"]).map(c=>{const rs=S.roles.filter(r=>r.cat==c);return rs.length?`<optgroup label="${E(c)}">${opt(rs.map(r=>[r.id,r.name]),"")}</optgroup>`:""}).join("")}
+function addTeam(){const p=+$("#tp").value,n=$("#tn").value.trim();if(!p)return toast("Choisissez un projet.");if(!n)return toast("Donnez un nom à l’équipe.");
+ if(S.teams.some(t=>t.pid==p&&t.name.toLowerCase()==n.toLowerCase()))return toast("Ce projet a déjà une équipe portant ce nom.");S.teams.push({id:nid(),name:n,pid:p,members:[]});save();render();toast("Équipe créée : "+n+" · "+P(p).name)}
+function saveTeam(id){const t=S.teams.find(x=>x.id==id),n=$("#en"+id).value.trim(),p=+$("#ep"+id).value;if(!n)return toast("Le nom est obligatoire.");
+ if(S.teams.some(x=>x.id!=id&&x.pid==p&&x.name.toLowerCase()==n.toLowerCase()))return toast("Ce projet a déjà une équipe portant ce nom.");
+ if(p!=t.pid)S.tasks.forEach(k=>{if(k.tid==id)k.tid=0});t.name=n;t.pid=p;et=0;save();render()}
+function delTeam(id){S.teams=S.teams.filter(t=>t.id!=id);S.tasks.forEach(k=>{if(k.tid==id)k.tid=0});save();render()}
+function addM(id){const n=$("#mn"+id).value.trim(),x=$("#mx"+id).value.trim();if(!n)return toast("Saisissez le nom du membre.");
+ const r=x?ensureRole(x):$("#mr"+id).value;S.teams.find(t=>t.id==id).members.push({n,r});save();render();if(x)toast("Rôle « "+x+" » ajouté à la liste.")}
+function rmM(id,i){S.teams.find(t=>t.id==id).members.splice(i,1);save();render()}
+V.roles=()=>`<h1>Rôles</h1><div class="card"><div class="row"><input id="rn" placeholder="Nom du rôle"><select id="ra">${ACC.map(a=>`<option>${a}</option>`).join("")}</select><input id="rr" type="number" min="0" step="any" placeholder="Taux journalier"><button class="b" onclick="addRole()">Ajouter le rôle</button></div><p class="mt" style="margin:8px 0 0">Le niveau d’accès définit ce que la personne peut faire dans l’application. Le rôle personnalisé reste disponible pour toutes les équipes.</p></div>`+
+ Object.keys(PRE).concat(["Personnalisé"]).map(c=>{const rs=S.roles.filter(r=>r.cat==c);return rs.length?`<h2>${E(c)}</h2><div class="card">${rs.map(r=>`<span class="tag">${E(r.name)}${r.custom?` · ${E(r.acc)}${r.rate?" · "+M(r.rate):""} <a href="#" onclick="delRole('${r.id}');return false" style="color:inherit" aria-label="Supprimer">×</a>`:""}</span>`).join("")}</div>`:""}).join("");
+function addRole(){const n=$("#rn").value.trim();if(!n)return toast("Saisissez le nom du rôle.");if(S.roles.some(r=>r.name.toLowerCase()==n.toLowerCase()))return toast("Ce rôle existe déjà.");ensureRole(n,"Personnalisé",$("#ra").value,$("#rr").value);save();render();toast("Rôle ajouté.")}
+function delRole(id){if(S.teams.some(t=>t.members.some(m=>m.r==id)))return toast("Ce rôle est utilisé : retirez-le des équipes d’abord.");S.roles=S.roles.filter(r=>r.id!=id);save();render()}
+let dc=0,dz=0;
+const p0=V.proj,t0=V.team,d0=V.dash;
+V.proj=()=>S.projects.length?p0():`<h1>Projets</h1><div class="card"><b>Aucun projet en cours</b><div class="row" style="margin-top:10px"><input id="np" placeholder="Nom du projet"><input id="nb" type="number" step="any" placeholder="Budget"><button class="b" onclick="addP()">Créer le projet</button></div></div>`;
+V.team=()=>S.projects.length?t0():`<h1>Équipes</h1><div class="card mt">Créez d’abord un projet : chaque équipe est rattachée à un projet.</div><button class="b" onclick="go('proj')">Créer un projet</button>`;
+V.dash=()=>d0()+(S.projects.length?"":`<div class="card"><b>Aucun projet en cours</b><p class="mt">Créez votre premier projet pour suivre son budget, ses tâches et son avancement.</p><button class="b" onclick="go('proj')">Créer un projet</button></div>`);
+function delP(){if(dc!=cp){dc=cp;render();return toast("Cliquez de nouveau pour supprimer ce projet, ses tâches, ses équipes et ses opérations.")}const id=cp;S.projects=S.projects.filter(p=>p.id!=id);S.tasks=S.tasks.filter(t=>t.pid!=id);S.teams=S.teams.filter(t=>t.pid!=id);S.tx=S.tx.filter(t=>t.pid!=id);dc=0;cp=S.projects[0]?S.projects[0].id:0;save();render();toast("Projet supprimé.")}
+function resetAll(){if(!dz){dz=1;render();return toast("Cliquez de nouveau pour effacer tous les projets et opérations.")}S.projects=[];S.tasks=[];S.teams=[];S.tx=[];dz=0;cp=0;save();render();toast("Tout est effacé.")}
+const csvCell=v=>{if(typeof v=="number")return String(v).replace(".",",");v=String(v==null?"":v);return /[";\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+function dlFile(name,blob){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function rowsTx(){return[["Date","Libellé","Type","Projet","Montant","Devise"]].concat([...S.tx].sort((a,b)=>a.date.localeCompare(b.date)).map(t=>[t.date,t.label,t.type=="rev"?"Revenu":"Dépense",P(t.pid).name,t.amt,S.cur||"XAF"]))}
+function rowsTk(){return[["Projet","Tâche","Équipe","Responsable","Statut","Priorité","Début","Fin","Avancement (%)","Budget prévu","Coût réel","Devise"]].concat(S.tasks.map(t=>{const q=S.teams.find(x=>x.id==t.tid);return[P(t.pid).name,t.title,q?q.name+" · "+P(q.pid).name:"",t.assignee||"",ST[t.status],PR[t.prio],t.start,t.end,t.progress,t.budget,t.cost,S.cur||"XAF"]}))}
+function exportCSV(kind){const rows=kind=="tx"?rowsTx():rowsTk();const txt="\ufeff"+rows.map(r=>r.map(csvCell).join(";")).join("\r\n");dlFile((kind=="tx"?"operations":"taches")+"-"+iso(0)+".csv",new Blob([txt],{type:"text/csv;charset=utf-8"}))}
+function exportXLSX(){if(!window.XLSX)return toast("Le module Excel n’est pas chargé. Utilisez l’export CSV.");const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(rowsTx()),"Opérations");XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(rowsTk()),"Tâches");XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([["Projet","Budget","Dépensé","Revenus","Résultat"]].concat(S.projects.map(p=>[p.name,p.budget,spent(p.id),inc(p.id),inc(p.id)-spent(p.id)]))),"Projets");XLSX.writeFile(wb,"manager-pro-"+iso(0)+".xlsx")}
+const f0=V.fin,p1=V.proj;
+V.fin=()=>f0()+`<div class="row" style="margin-top:12px"><button class="g" onclick="exportCSV('tx')">Exporter les opérations (CSV)</button><button class="g" onclick="exportXLSX()">Exporter tout (Excel)</button></div>`;
+V.proj=()=>p1()+(S.projects.length?`<div class="row" style="margin-top:12px"><button class="g" onclick="exportCSV('tk')">Exporter les tâches (CSV)</button><button class="g" onclick="exportXLSX()">Exporter tout (Excel)</button></div>`:"");
+
+/* ===== MANAGER PRO : évolutions 1, 3, 4, 5 ===== */
+const cur0=()=>S.cur||"XAF";
+const fmtC=(n,c)=>{try{return new Intl.NumberFormat("fr-FR",{style:"currency",currency:c}).format(n)}catch(e){return n+" "+c}};
+const txo=t=>({orig:t.orig!=null?t.orig:t.amt,cur:t.cur||cur0(),rate:t.rate||1});
+let ex=0;
+/* 1 + 4 : modifier une opération, une devise par opération */
+function rateUI(){const c=$("#xc").value,b=cur0(),r=$("#xr");r.disabled=c==b;r.value=c==b?1:((S.rates||{})[c]||"");$("#xh").textContent=c==b?"":"1 "+c+" = combien de "+b+" ?"}
+V.fin=()=>{const b=cur0(),o=ex?S.tx.find(x=>x.id==ex):null,t=o?Object.assign({},o,txo(o)):{label:"",orig:"",type:"dep",pid:0,date:iso(0),cur:b,rate:1};
+ return`<h1>Finances</h1><div class="card"><b>${o?"Modifier l’opération":"Nouvelle opération"}</b><div class="row" style="margin-top:8px"><input id="xl" placeholder="Libellé" value="${E(t.label)}"><input id="xa" type="number" min="0" step="any" placeholder="Montant" value="${E(t.orig)}"><select id="xc" onchange="rateUI()" aria-label="Devise">${CUR.map(c=>`<option value="${c}"${c==t.cur?" selected":""}>${c}</option>`).join("")}</select><input id="xr" type="number" min="0" step="any" placeholder="Taux" value="${E(t.rate)}" ${t.cur==b?"disabled":""} style="width:110px" aria-label="Taux de change"><select id="xt"><option value="dep"${t.type=="dep"?" selected":""}>Dépense</option><option value="rev"${t.type=="rev"?" selected":""}>Revenu</option></select><select id="xp"><option value="0">Sans projet</option>${pOpts(t.pid)}</select><input id="xd" type="date" value="${t.date}"><button class="b" onclick="saveTx()">${o?"Enregistrer les modifications":"Ajouter l’opération"}</button>${o?`<button class="g" onclick="ex=0;render()">Annuler</button>`:""}</div><div id="xh" class="mt" style="margin-top:6px">${t.cur==b?"":"1 "+t.cur+" = combien de "+b+" ?"}</div><p class="mt" style="margin:6px 0 0">Devise de référence : ${b}. Pour une autre devise, saisissez le taux : le montant est converti et enregistré en ${b}.</p></div><div class="card tw"><table><tr><th>Date</th><th>Libellé</th><th>Projet</th><th>Montant</th><th></th></tr>${[...S.tx].sort((x,y)=>y.date.localeCompare(x.date)).map(t=>{const q=txo(t);return`<tr><td>${t.date}</td><td>${E(t.label)}</td><td>${E(P(t.pid).name)}</td><td class="${t.type=="rev"?"ok":"ko"}">${t.type=="rev"?"+":"−"} ${fmtC(q.orig,q.cur)}${q.cur!=b?`<div class="mt">≈ ${M(t.amt)}</div>`:""}</td><td><button class="g" onclick="editTx(${t.id})">Modifier</button> <button class="g d" onclick="delTx(${t.id})">Supprimer</button></td></tr>`}).join("")}</table></div><div class="row" style="margin-top:12px"><button class="g" onclick="exportCSV('tx')">Exporter les opérations (CSV)</button><button class="g" onclick="exportXLSX()">Exporter tout (Excel)</button></div>`};
+function saveTx(){const l=$("#xl").value.trim(),o=+$("#xa").value,c=$("#xc").value,b=cur0(),r=c==b?1:+$("#xr").value;
+ if(!l||!(o>0))return toast("Saisissez un libellé et un montant supérieur à 0.");
+ if(!(r>0))return toast("Saisissez le taux de change vers "+b+".");
+ const d={label:l,orig:o,cur:c,rate:r,amt:o*r,type:$("#xt").value,pid:+$("#xp").value,date:$("#xd").value||iso(0)};
+ if(c!=b){S.rates=S.rates||{};S.rates[c]=r}
+ if(ex){Object.assign(S.tx.find(x=>x.id==ex),d);ex=0}else S.tx.push(Object.assign({id:nid()},d));
+ save();render();toast("Opération enregistrée.")}
+function editTx(id){ex=id;render();$("#main").scrollTop=0}
+function rowsTx(){return[["Date","Libellé","Type","Projet","Montant d’origine","Devise d’origine","Taux","Montant en "+cur0()]].concat([...S.tx].sort((a,b)=>a.date.localeCompare(b.date)).map(t=>{const q=txo(t);return[t.date,t.label,t.type=="rev"?"Revenu":"Dépense",P(t.pid).name,q.orig,q.cur,q.rate,t.amt]}))}
+/* 3 : dépendances dans le Gantt */
+const addD=(s,n)=>new Date((day(s)+n)*864e5).toISOString().slice(0,10);
+function loops(id,dep){let x=dep,n=0;while(x&&n++<999){if(x==id)return true;const t=S.tasks.find(k=>k.id==x);x=t&&t.dep}return false}
+function cascade(){let ch=0;for(let i=0;i<S.tasks.length+2;i++){let mv=0;S.tasks.forEach(t=>{const p=t.dep&&S.tasks.find(x=>x.id==t.dep);if(!p)return;const need=addD(p.end,1);if(t.start<need){const d=day(need)-day(t.start);t.log.unshift({d:new Date().toLocaleString("fr-FR"),t:"Planning",m:`Décalée de ${d} jour(s) (tâche précédente : ${p.title})`});t.start=need;t.end=addD(t.end,d);mv=1;ch++}});if(!mv)break}return ch}
+function setDep(id,v){v=+v;const t=S.tasks.find(x=>x.id==id);if(v&&loops(id,v)){render();return toast("Dépendance impossible : elle créerait une boucle.")}
+ t.dep=v;t.log.unshift({d:new Date().toLocaleString("fr-FR"),t:"Planning",m:v?"Dépendance ajoutée":"Dépendance retirée"});const n=cascade();save();render();toast(n?n+" tâche(s) décalée(s) automatiquement.":"Dépendance enregistrée.")}
+function gantt(ts){if(!ts.length)return`<div class="card mt">Aucune tâche. Ajoutez-en une pour voir le diagramme.</div>`;
+ const a=Math.min(...ts.map(t=>day(t.start)))-1,b=Math.max(...ts.map(t=>day(t.end)))+2,pd=26,w=(b-a+1)*pd,td=day(iso(0));
+ const tdl=td>=a&&td<=b?`<div class="td" style="left:${(td-a)*pd}px"></div>`:"";let h="";
+ for(let i=0;i<=b-a;i+=7)h+=`<span style="left:${i*pd+2}px">${new Date((a+i)*864e5).toLocaleDateString("fr-FR",{day:"2-digit",month:"short",timeZone:"UTC"})}</span>`;
+ const ix={};ts.forEach((t,i)=>ix[t.id]=i);let ar="";
+ ts.forEach((t,i)=>{const p=t.dep&&ix[t.dep]!==undefined?ts[ix[t.dep]]:null;if(!p)return;const x1=(day(p.end)-a+1)*pd,y1=38*(ix[p.id]+1)+19,x2=(day(t.start)-a)*pd,y2=38*(i+1)+19,xm=x2>x1+6?(x1+x2)/2:x1-3;ar+=`<path d="M${x1} ${y1}H${xm}V${y2}H${x2-1}" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M${x2} ${y2}l-5 -3.5v7z" fill="currentColor"/>`});
+ const pan=`<div class="card"><b>Dépendances</b><p class="mt" style="margin:4px 0 8px">Une tâche qui dépend d’une autre commence au plus tôt le lendemain de la fin de celle-ci. Si la tâche précédente prend du retard, la suivante est décalée automatiquement.</p>${ts.map(t=>`<div class="row" style="margin-bottom:6px"><span style="flex:1;min-width:140px">${E(t.title)}</span><select onchange="setDep(${t.id},this.value)" aria-label="Tâche précédente"><option value="0">Aucune dépendance</option>${opt(ts.filter(x=>x.id!=t.id).map(x=>[x.id,"Après : "+x.title]),t.dep||0)}</select></div>`).join("")}</div>`;
+ return`<div class="gt"><div style="width:${w+190}px;position:relative"><div class="gr gh"><div class="gl mt">Tâche</div><div class="gc" style="width:${w}px">${h}${tdl}</div></div>`+ts.map(t=>`<div class="gr"><div class="gl" onclick="openT(${t.id})" title="${E(t.title)}">${E(t.title)}</div><div class="gc" style="width:${w}px">${tdl}<div class="gb s${t.status}" onclick="openT(${t.id})" style="left:${(day(t.start)-a)*pd}px;width:${(day(t.end)-day(t.start)+1)*pd}px" title="${E(t.title)} · ${t.progress} %"><i style="width:${t.progress}%"></i></div></div></div>`).join("")+`<svg style="position:absolute;left:190px;top:0;pointer-events:none;color:var(--tx);opacity:.6" width="${w}" height="${38*(ts.length+1)}">${ar}</svg></div></div><p class="mt">Barre claire : avancement. Ligne rouge : aujourd’hui. Flèches : dépendances. Cliquez une barre pour modifier la tâche.</p>`+pan}
+const sv0=saveT;saveT=function(){sv0();const n=cascade();if(n){save();render();modal();toast(n+" tâche(s) suivante(s) décalée(s) automatiquement.")}};
+/* 5 : coût des équipes */
+const rateOf=m=>{const r=S.roles.find(x=>x.id==m.r);return r&&r.rate?r.rate:0};
+const teamCost=t=>sum(t.members,m=>(+m.j||0)*rateOf(m));
+function teamCard(t,p){const ed=et==t.id,has=S.tx.some(x=>x.teamId==t.id);
+ return`<div class="card"><div class="row" style="justify-content:space-between">${ed?`<input id="en${t.id}" value="${E(t.name)}"><select id="ep${t.id}">${pOpts(t.pid)}</select>`:`<b>${E(t.name)} · ${E(p.name)}</b>`}<span>${ed?`<button class="b" onclick="saveTeam(${t.id})">Enregistrer</button> <button class="g" onclick="et=0;render()">Annuler</button>`:`<button class="g" onclick="et=${t.id};render()">Modifier</button> <button class="g d" onclick="delTeam(${t.id})">Supprimer</button>`}</span></div>
+ <div style="margin:8px 0">${t.members.map((m,i)=>`<div class="row" style="margin:4px 0"><span style="flex:1;min-width:150px">${E(m.n)} <span class="mt">· ${E(Rn(m.r))} · ${rateOf(m)?M(rateOf(m))+" / jour":"taux à définir (page Rôles)"}</span></span><input type="number" min="0" step="any" value="${m.j||0}" style="width:80px" onchange="setDays(${t.id},${i},this.value)" aria-label="Jours travaillés"><span class="mt">jours</span><b style="min-width:110px;text-align:right">${M((+m.j||0)*rateOf(m))}</b><a href="#" onclick="rmM(${t.id},${i});return false" style="color:var(--ko)" aria-label="Retirer">×</a></div>`).join("")||`<span class="mt">Aucun membre.</span>`}</div>
+ <div class="row"><input id="mn${t.id}" placeholder="Nom du membre" style="width:150px"><select id="mr${t.id}">${rOpts()}</select><input id="mx${t.id}" placeholder="ou saisir un nouveau rôle" style="width:190px"><button class="g" onclick="addM(${t.id})">Ajouter le membre</button></div>
+ <div class="row" style="justify-content:space-between;margin-top:10px"><b>Coût de l’équipe : ${M(teamCost(t))}</b><button class="g" onclick="postCost(${t.id})">${has?"Mettre à jour la dépense du projet":"Enregistrer comme dépense du projet"}</button></div></div>`}
+function setDays(id,i,v){S.teams.find(t=>t.id==id).members[i].j=Math.max(0,+v||0);save();render()}
+function postCost(id){const t=S.teams.find(x=>x.id==id),c=teamCost(t);if(!(c>0))return toast("Renseignez des jours travaillés et les taux journaliers (page Rôles).");
+ const d={label:"Main-d’œuvre : "+t.name,amt:c,orig:c,cur:cur0(),rate:1,type:"dep",pid:t.pid,date:iso(0),teamId:id},x=S.tx.find(k=>k.teamId==id);
+ if(x)Object.assign(x,d);else S.tx.push(Object.assign({id:nid()},d));save();render();toast("Dépense du projet mise à jour.")}
+const dt0=delTeam;delTeam=function(id){S.tx=S.tx.filter(x=>x.teamId!=id);dt0(id)};
+const st0=saveTeam;saveTeam=function(id){st0(id);const t=S.teams.find(x=>x.id==id);S.tx.forEach(x=>{if(x.teamId==id&&t){x.pid=t.pid;x.label="Main-d’œuvre : "+t.name}});save();render()};
+function setRate(id,v){S.roles.find(x=>x.id==id).rate=Math.max(0,+v||0);save();render()}
+const ro0=V.roles;
+V.roles=()=>{const used=new Set(S.teams.flatMap(t=>t.members.map(m=>m.r))),rs=S.roles.filter(r=>r.custom||used.has(r.id));
+ return ro0()+`<h2>Taux journaliers</h2><div class="card"><p class="mt" style="margin:0 0 8px">Ces taux servent à calculer le coût des équipes. Ils s’affichent pour vos rôles personnalisés et pour les rôles déjà utilisés dans une équipe.</p>${rs.length?rs.map(r=>`<div class="row" style="margin-bottom:6px"><span style="flex:1;min-width:150px">${E(r.name)}</span><input type="number" min="0" step="any" value="${r.rate||""}" placeholder="0" style="width:130px" onchange="setRate('${r.id}',this.value)" aria-label="Taux journalier de ${E(r.name)}"><span class="mt">${cur0()} / jour</span></div>`).join(""):`<span class="mt">Ajoutez des membres à une équipe pour définir leurs taux.</span>`}</div>`};
+/* ===== FIN DU BLOC ===== */
+
+/* ===== MANAGER PRO : compte en ligne, offre Pro, installation ===== */
+/* À REMPLIR plus tard (voir le guide). Tant que SB_URL est vide, l’application reste en mode local, sans limite. */
+const SB_URL="",SB_KEY="",LIEN_PAIEMENT="",LIMITE_GRATUIT=2;
+/* Paiement. LIEN_PAIEMENT = lien carte bancaire. MOBILE_MONEY = vos numéros. WHATSAPP = numéro avec indicatif pays, chiffres seulement. */
+const PRIX_PRO="6 € par mois",WHATSAPP="",EMAIL_PARAM="";/* EMAIL_PARAM : nom du paramètre qui préremplit l’e-mail dans votre lien de paiement (Stripe : prefilled_email ; Lemon Squeezy : checkout[email]). Laissez vide si vous ne savez pas. */
+const MOBILE_MONEY=[/* {nom:"MTN Mobile Money",numero:"06 000 00 00",titulaire:"Votre nom"},{nom:"Airtel Money",numero:"05 000 00 00",titulaire:"Votre nom"} */];
+let sb=null,USER=null,ORG=null,PLAN="gratuit",tmC,DEFER=null;
+try{if(window.supabase&&SB_URL)sb=supabase.createClient(SB_URL,SB_KEY)}catch(e){}
+const isPro=()=>!sb||PLAN=="pro";
+const box=document.createElement("div");box.id="authbox";document.body.appendChild(box);
+function closeAuth(){box.innerHTML=""}
+function saveCloud(){if(!sb||!ORG)return;clearTimeout(tmC);tmC=setTimeout(()=>sb.from("app_state").update({data:S,updated_at:new Date().toISOString()}).eq("organisation_id",ORG).then(r=>{if(r.error)toast("Sauvegarde en ligne impossible.")}),800)}
+async function loadCloud(){
+ const r=await sb.from("membres").select("organisation_id").limit(1);
+ if(r.error)return toast("Erreur de connexion au compte.");
+ if(r.data&&r.data.length)ORG=r.data[0].organisation_id;else{const c=await sb.rpc("creer_organisation",{nom:"Mon entreprise"});if(c.error)return toast("Création du compte impossible.");ORG=c.data}
+ const a=await sb.from("abonnements").select("plan,expire").eq("organisation_id",ORG).maybeSingle();
+ PLAN=a.data&&a.data.plan=="pro"&&(!a.data.expire||a.data.expire>=iso(0))?"pro":"gratuit";
+ const d=await sb.from("app_state").select("data").eq("organisation_id",ORG).maybeSingle();
+ if(d.data&&d.data.data&&d.data.data.roles)S=d.data.data;else saveCloud();
+ render()}
+function authUI(msg,mode){mode=mode||"in";box.innerHTML=`<div class="ov" onclick="if(event.target==this)closeAuth()"><div class="md"><div class="row" style="justify-content:space-between"><b style="font-size:18px">${mode=="up"?"Créer un compte":"Se connecter"}</b><button class="g" onclick="closeAuth()">Fermer</button></div>${(msg||!sb)?`<p class="mt">${E(msg||"Les comptes en ligne seront bientôt disponibles.")}</p>`:""}<label for="ae">E-mail</label><input id="ae" type="email" autocomplete="email"><label for="ap">Mot de passe (8 caractères minimum)</label><input id="ap" type="password" autocomplete="${mode=="up"?"new-password":"current-password"}"><div class="row" style="margin-top:14px"><button class="b" onclick="doAuth('${mode}')">${mode=="up"?"Créer mon compte":"Me connecter"}</button><button class="g" onclick="authUI('','${mode=="up"?"in":"up"}')">${mode=="up"?"J’ai déjà un compte":"Créer un compte"}</button></div><p class="mt" style="margin-top:12px"><a href="#" onclick="resetPw();return false">Mot de passe oublié ?</a></p></div></div>`}
+async function doAuth(m){if(!sb)return toast("Les comptes ne sont pas encore configurés.");const e=$("#ae").value.trim(),p=$("#ap").value;if(!e||p.length<8)return toast("E-mail et mot de passe de 8 caractères minimum.");
+ const r=m=="up"?await sb.auth.signUp({email:e,password:p}):await sb.auth.signInWithPassword({email:e,password:p});
+ if(r.error)return toast(r.error.message);
+ if(m=="up"&&!r.data.session){closeAuth();return toast("Compte créé : confirmez votre e-mail, puis connectez-vous.")}
+ USER=r.data.user;closeAuth();await loadCloud();toast("Connecté.")}
+async function resetPw(){const e=$("#ae").value.trim();if(!e)return toast("Saisissez votre e-mail.");const r=await sb.auth.resetPasswordForEmail(e);toast(r.error?r.error.message:"E-mail de réinitialisation envoyé.")}
+async function newPw(){const p=$("#np2").value;if(p.length<8)return toast("8 caractères minimum.");const r=await sb.auth.updateUser({password:p});toast(r.error?r.error.message:"Mot de passe modifié.");if(!r.error)closeAuth()}
+async function logout(){await sb.auth.signOut();USER=ORG=null;PLAN="gratuit";S=empty();save();render()}
+if(sb){sb.auth.getSession().then(async r=>{const s=r.data&&r.data.session;if(s){USER=s.user;await loadCloud()}});
+ sb.auth.onAuthStateChange(ev=>{if(ev=="PASSWORD_RECOVERY")box.innerHTML=`<div class="ov"><div class="md"><b style="font-size:18px">Nouveau mot de passe</b><label for="np2">Mot de passe (8 caractères minimum)</label><input id="np2" type="password" autocomplete="new-password"><div class="row" style="margin-top:14px"><button class="b" onclick="newPw()">Enregistrer</button></div></div></div>`})}
+/* Offre gratuite et offre Pro */
+const proOk=()=>!!sb&&PLAN=="pro";
+function goPro(){closeAuth();st="compte";go("set")}
+function upsell(msg){box.innerHTML=`<div class="ov" onclick="if(event.target==this)closeAuth()"><div class="md"><b style="font-size:18px">Offre Pro</b><p>${E(msg)}</p><ul><li>Projets illimités</li><li>Export CSV et Excel</li></ul><div class="row"><button class="b" onclick="goPro()">Passer à Pro</button><button class="g" onclick="closeAuth()">Plus tard</button></div></div></div>`}
+function payCard(){if(!USER)return authUI("Créez d’abord un compte : votre offre Pro y sera rattachée.","up");if(!LIEN_PAIEMENT){closeAuth();return toast("Le paiement n’est pas encore configuré.")}window.open(LIEN_PAIEMENT+(EMAIL_PARAM?(LIEN_PAIEMENT.includes("?")?"&":"?")+EMAIL_PARAM+"="+encodeURIComponent(USER.email):""),"_blank","noopener")}
+const ap0=addP;addP=function(){if(!isPro()&&S.projects.length>=LIMITE_GRATUIT)return upsell("L’offre gratuite est limitée à "+LIMITE_GRATUIT+" projets.");ap0()};
+const ec0=exportCSV,ex0=exportXLSX;
+exportCSV=function(k){if(!isPro())return upsell("L’export est réservé à l’offre Pro.");ec0(k)};
+exportXLSX=function(){if(!isPro())return upsell("L’export est réservé à l’offre Pro.");ex0()};
+
+/* Page « Compte et abonnement » */
+V.abo=()=>{const pro=proOk(),wa=WHATSAPP.replace(/\D/g,""),mm=MOBILE_MONEY.length,none=!LIEN_PAIEMENT&&!mm,btn="display:inline-block;background:var(--pr);color:#fff;text-decoration:none;padding:8px 13px;border-radius:8px";
+ return`<h1>Compte et abonnement</h1><div class="card"><b>Mon compte</b>${USER?`<p>Connecté : ${E(USER.email)}</p><button class="g" onclick="logout()">Se déconnecter</button>`:`<p class="mt">Créez un compte pour sauvegarder vos projets en ligne et les retrouver sur tous vos appareils.</p><div class="row"><button class="b" onclick="authUI('','up')">Créer un compte</button><button class="g" onclick="authUI('','in')">Se connecter</button></div>${sb?"":`<p class="mt" style="margin:8px 0 0">Les comptes en ligne seront bientôt disponibles. En attendant, vos données restent sur cet appareil.</p>`}`}</div>
+<h2>Offres</h2><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px"><div class="card"><b>Gratuit</b> ${sb&&!pro?`<span class="tag">Votre offre</span>`:""}<p class="mt" style="margin:6px 0">${LIMITE_GRATUIT} projets, finances, tâches, Gantt, équipes.</p></div><div class="card"><b>Pro · ${E(PRIX_PRO)}</b> ${pro?`<span class="tag">Votre offre</span>`:""}<p class="mt" style="margin:6px 0">Projets illimités, export CSV et Excel.</p></div></div>
+${pro?"":`<h2>Payer l’offre Pro</h2><div class="card">${USER?"":`<p class="mt" style="margin-top:0">Créez d’abord un compte : l’offre Pro sera rattachée à votre e-mail.</p>`}${LIEN_PAIEMENT?`<div class="row" style="margin-bottom:10px"><button class="b" onclick="payCard()">Payer par carte bancaire</button><span class="mt">Offre Pro activée sous 24 heures après le paiement.</span></div>`:""}${mm?`<p style="margin:10px 0 6px"><b>Par Mobile Money</b></p>${MOBILE_MONEY.map(m=>`<div style="margin:4px 0">${E(m.nom)} : <b>${E(m.numero)}</b> <span class="mt">(${E(m.titulaire)})</span></div>`).join("")}<ol class="mt"><li>Envoyez ${E(PRIX_PRO)} à l’un de ces numéros.</li><li>Envoyez la preuve (capture ou code de la transaction) avec l’e-mail de votre compte.</li><li>Votre offre Pro est activée sous 24 heures.</li></ol>${wa?`<a style="${btn}" href="https://wa.me/${wa}?text=${encodeURIComponent("Bonjour, je souhaite activer l’offre Pro de Manager Pro. Mon e-mail : "+(USER?USER.email:""))}" target="_blank" rel="noopener">Envoyer la preuve sur WhatsApp</a>`:""}`:""}${none?`<p class="mt" style="margin:0">Le paiement sera bientôt disponible.</p>`:""}</div>`}`};
+/* Application installable (PWA) et barre latérale */
+addEventListener("beforeinstallprompt",e=>{e.preventDefault();DEFER=e;render()});
+function installApp(){if(!DEFER)return;DEFER.prompt();DEFER=null;render()}
+if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+/* ===== FIN DU BLOC ===== */
+
+/* ===== MANAGER PRO : assistant intégré ===== */
+/* Collez l'adresse de votre assistant entre les guillemets. Vide = bouton masqué. */
+const ASSISTANT_URL="";
+(function(){if(!ASSISTANT_URL)return;
+ const st=document.createElement("style");st.textContent="#asb{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));width:60px;height:60px;border-radius:50%;border:1px solid var(--bd);padding:0;cursor:pointer;background:var(--sf);box-shadow:0 6px 18px #0004;z-index:40;display:flex;align-items:center;justify-content:center}#asb img{width:42px;height:42px}#asp{position:fixed;right:18px;bottom:calc(88px + env(safe-area-inset-bottom,0px));width:400px;height:min(640px,calc(100% - 120px));background:var(--sf);color:var(--tx);border:1px solid var(--bd);border-radius:14px;box-shadow:0 10px 34px #0005;z-index:41;display:none;flex-direction:column;overflow:hidden}#asp.on{display:flex}#asp header{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;font-weight:600;border-bottom:1px solid var(--bd)}#asp header button{border:0;background:none;color:inherit;font-size:24px;cursor:pointer}#asp iframe{flex:1;border:0;width:100%;background:#fff}@media (max-width:760px){#asb{bottom:calc(76px + env(safe-area-inset-bottom,0px))}#asp{inset:0;width:auto;height:auto;border-radius:0}}";
+ document.head.appendChild(st);
+ const b=document.createElement("button");b.id="asb";b.title="Assistant Manager Pro";b.setAttribute("aria-label","Ouvrir l’assistant");b.innerHTML='<img src="logo.svg" alt="">';
+ const p=document.createElement("div");p.id="asp";p.innerHTML='<header><span>Assistant Manager Pro</span><button aria-label="Fermer">×</button></header>';
+ let f=null;
+ b.onclick=()=>{p.classList.toggle("on");if(p.classList.contains("on")&&!f){f=document.createElement("iframe");f.src=ASSISTANT_URL;f.title="Assistant Manager Pro";f.allow="clipboard-write";p.appendChild(f)}};
+ p.querySelector("button").onclick=()=>p.classList.remove("on");
+ document.body.appendChild(b);document.body.appendChild(p)})();
+/* ===== FIN DU BLOC ===== */
+
+/* ===== MANAGER PRO : paramètres et apparence ===== */
+let st="app";
+const UI=(()=>{try{return JSON.parse(localStorage.getItem("gp_ui"))||{}}catch(e){return{}}})();
+function applyUI(){const r=document.documentElement;if(UI.theme&&UI.theme!="auto")r.dataset.theme=UI.theme;else delete r.dataset.theme;r.style.setProperty("--fs",(UI.fs||15)+"px")}
+function setUI(k,v){UI[k]=v;try{localStorage.setItem("gp_ui",JSON.stringify(UI))}catch(e){}applyUI();render()}
+applyUI();
+const sub=h=>h.replace(/<h1>.*?<\/h1>/,"");
+const TS=[["app","Apparence"],["dev","Devise"],["compte","Compte et abonnement"],["roles","Rôles et taux"],["don","Données"],["aide","Aide"]];
+function setBody(){
+ if(st=="app")return`<div class="card"><b>Thème</b><div class="row" style="margin:8px 0 16px">${[["auto","Automatique"],["light","Clair"],["dark","Sombre"]].map(([k,l])=>`<button class="${(UI.theme||"auto")==k?"b":"g"}" onclick="setUI('theme','${k}')">${l}</button>`).join("")}</div><b>Taille du texte</b><div class="row" style="margin-top:8px">${[[15,"Normal"],[17,"Grand"],[19,"Très grand"]].map(([k,l])=>`<button class="${(UI.fs||15)==k?"b":"g"}" onclick="setUI('fs',${k})">${l}</button>`).join("")}</div><p class="mt" style="margin:14px 0 0">« Automatique » suit le réglage clair ou sombre de votre appareil.</p></div>`;
+ if(st=="dev")return`<div class="card"><b>Devise de référence</b><p class="mt" style="margin:6px 0 10px">Tous les totaux sont affichés dans cette devise. Changer de devise modifie l’affichage, pas la valeur des montants déjà saisis : choisissez-la au début.</p><select aria-label="Devise" onchange="setCur(this.value)" style="max-width:100%">${CUR.map(c=>`<option value="${c}"${c==(S.cur||"XAF")?" selected":""}>${c} · ${cn(c)}</option>`).join("")}</select></div>`;
+ if(st=="compte")return sub(V.abo());
+ if(st=="roles")return sub(V.roles());
+ if(st=="don")return`<div class="card"><b>Exporter</b><div class="row" style="margin:8px 0 16px"><button class="g" onclick="exportCSV('tx')">Opérations (CSV)</button><button class="g" onclick="exportCSV('tk')">Tâches (CSV)</button><button class="g" onclick="exportXLSX()">Tout en Excel</button></div>${DEFER?`<b>Installer</b><div class="row" style="margin:8px 0 16px"><button class="b" onclick="installApp()">Installer l’application</button></div>`:""}<b>Zone sensible</b><p class="mt" style="margin:6px 0 10px">Efface tous les projets, tâches, équipes et opérations${USER?" de cet appareil et de votre compte en ligne":" de cet appareil"}.</p><button class="g d" onclick="resetAll()">${dz?"Confirmer : tout effacer":"Tout effacer et repartir à zéro"}</button></div>`;
+ return`<div class="card"><b>Aide et informations</b><p style="margin:10px 0 4px"><a href="confidentialite.html">Politique de confidentialité</a></p><p style="margin:4px 0"><a href="conditions.html">Conditions d’utilisation</a></p>${WHATSAPP?`<p style="margin:4px 0"><a href="https://wa.me/${WHATSAPP.replace(/\D/g,"")}" target="_blank" rel="noopener">Contacter le support sur WhatsApp</a></p>`:""}<p class="mt" style="margin:12px 0 0">Manager Pro · version bêta · build 9 du 26 novembre 2026</p></div>`}
+V.set=()=>`<h1>Paramètres</h1><div class="tabs">${TS.map(([k,l])=>`<button class="${st==k?"on":""}" onclick="st='${k}';render()">${l}</button>`).join("")}</div>`+setBody();
+/* ===== MANAGER PRO : profil, moyens de paiement, déclaration de paiement ===== */
+let CFG={},CFGD=null,ADMIN=false,PAYS=[],MESP=[],CAM=null;
+let PROFIL=(()=>{try{return JSON.parse(localStorage.getItem("gp_profil"))||{}}catch(e){return{}}})();
+const cfg=()=>({prix:CFG.prix||PRIX_PRO,wa:String(CFG.whatsapp||WHATSAPP||"").replace(/\D/g,""),carte:CFG.carte||LIEN_PAIEMENT,mobile:(CFG.mobile&&CFG.mobile.length)?CFG.mobile:MOBILE_MONEY});
+const stl=s=>({en_attente:"En attente de vérification",valide:"Validé",refuse:"Refusé"}[s]||s);
+function avatar(n){const p=PROFIL.photo;if(p)return`<img src="${E(p)}" alt="" style="width:${n}px;height:${n}px;border-radius:50%;object-fit:cover;flex:none">`;
+ return`<span style="width:${n}px;height:${n}px;border-radius:50%;background:var(--pr);color:var(--onpr);display:inline-flex;align-items:center;justify-content:center;font-weight:800;flex:none">${E(((PROFIL.nom||(USER&&USER.email)||"M").trim()[0]||"M").toUpperCase())}</span>`}
+function pf(k,v){PROFIL[k]=v}
+async function saveProfil(){try{localStorage.setItem("gp_profil",JSON.stringify(PROFIL))}catch(e){}
+ if(sb&&USER){const r=await sb.from("profils").upsert({user_id:USER.id,nom:PROFIL.nom||"",entreprise:PROFIL.entreprise||"",telephone:PROFIL.telephone||"",photo:PROFIL.photo||"",updated_at:new Date().toISOString()});if(r.error){render();return toast("Profil enregistré sur cet appareil seulement : "+r.error.message)}}
+ render();toast("Profil enregistré.")}
+function toSquare(src,w,h){const c=document.createElement("canvas");c.width=c.height=256;const s=Math.min(w,h);c.getContext("2d").drawImage(src,(w-s)/2,(h-s)/2,s,s,0,0,256,256);return c.toDataURL("image/jpeg",.82)}
+function pickPhoto(inp){const f=inp.files&&inp.files[0];if(!f)return;if(!/^image\//.test(f.type))return toast("Choisissez une image.");
+ const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{PROFIL.photo=toSquare(im,im.width,im.height);render()};im.onerror=()=>toast("Image illisible.");im.src=fr.result};fr.readAsDataURL(f)}
+async function camOpen(){if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)return $("#pf_cam").click();
+ try{CAM=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"}});box.innerHTML=`<div class="ov"><div class="md"><b style="font-size:18px">Prendre une photo</b><video id="cv" autoplay playsinline muted style="width:100%;border-radius:10px;margin:10px 0"></video><div class="row"><button class="b" onclick="camShot()">Capturer</button><button class="g" onclick="camStop()">Annuler</button></div></div></div>`;$("#cv").srcObject=CAM}
+ catch(e){toast("Caméra indisponible : choisissez une photo.");$("#pf_cam").click()}}
+function camStop(){if(CAM){CAM.getTracks().forEach(t=>t.stop());CAM=null}closeAuth()}
+function camShot(){const v=$("#cv");if(!v||!v.videoWidth)return;PROFIL.photo=toSquare(v,v.videoWidth,v.videoHeight);camStop();render()}
+function profBody(){return`<div class="card"><div class="row" style="gap:16px">${avatar(88)}<div><div class="row"><button class="g" onclick="$('#pf_file').click()">Choisir une photo</button><button class="g" onclick="camOpen()">Prendre une photo</button>${PROFIL.photo?`<button class="g d" onclick="PROFIL.photo='';render()">Retirer</button>`:""}</div><p class="mt" style="margin:6px 0 0">La photo est recadrée en carré et réduite automatiquement.</p></div></div>
+<input id="pf_file" type="file" accept="image/*" hidden onchange="pickPhoto(this)"><input id="pf_cam" type="file" accept="image/*" capture="user" hidden onchange="pickPhoto(this)">
+<label for="pf_n">Nom complet</label><input id="pf_n" value="${E(PROFIL.nom||"")}" oninput="pf('nom',this.value)" autocomplete="name">
+<label for="pf_e">Entreprise ou activité</label><input id="pf_e" value="${E(PROFIL.entreprise||"")}" oninput="pf('entreprise',this.value)" autocomplete="organization">
+<label for="pf_t">Téléphone</label><input id="pf_t" type="tel" value="${E(PROFIL.telephone||"")}" oninput="pf('telephone',this.value)" autocomplete="tel">
+<label for="pf_m">E-mail</label><input id="pf_m" value="${E(USER?USER.email:"Non connecté")}" disabled>
+<div class="row" style="margin-top:14px"><button class="b" onclick="saveProfil()">Enregistrer le profil</button></div>${USER?"":`<p class="mt" style="margin:10px 0 0">Connectez-vous pour retrouver votre profil sur tous vos appareils.</p>`}</div>`}
+async function loadCfg(){if(!sb)return;try{const r=await sb.from("config_paiement").select("data").eq("id",1).maybeSingle();if(r.data&&r.data.data)CFG=r.data.data}catch(e){}}
+async function loadPay(){if(!sb||!USER)return;try{const r=await sb.from("paiements").select("*").order("created_at",{ascending:false}).limit(60),all=r.data||[];MESP=all.filter(x=>x.user_id==USER.id);PAYS=ADMIN?all:[]}catch(e){}}
+async function loadExtras(){if(!sb||!USER)return;
+ try{const a=await sb.from("admins").select("user_id").maybeSingle();ADMIN=!!a.data}catch(e){}
+ await loadCfg();
+ try{const p=await sb.from("profils").select("nom,entreprise,telephone,photo").eq("user_id",USER.id).maybeSingle();if(p.data)PROFIL=Object.assign({},PROFIL,p.data)}catch(e){}
+ await loadPay();render()}
+const lc0=loadCloud;loadCloud=async function(){await lc0();await loadExtras()};
+const lo0=logout;logout=async function(){await lo0();ADMIN=false;PAYS=[];MESP=[];render()};
+if(sb)loadCfg().then(()=>render());
+function copyNum(n){try{navigator.clipboard.writeText(n).then(()=>toast("Numéro copié."),()=>toast(n))}catch(e){toast(n)}}
+function payCard(){const c=cfg();if(!USER)return authUI("Créez d’abord un compte : votre offre Pro y sera rattachée.","up");if(!c.carte)return toast("Le paiement par carte n’est pas encore configuré.");
+ window.open(c.carte+(EMAIL_PARAM?(c.carte.includes("?")?"&":"?")+EMAIL_PARAM+"="+encodeURIComponent(USER.email):""),"_blank","noopener")}
+async function declarePay(){if(!sb||!USER)return authUI("Connectez-vous pour déclarer un paiement.","in");
+ const m=$("#dp_m").value,a=$("#dp_a").value.trim(),t=$("#dp_t").value.trim(),r=$("#dp_r").value.trim();if(!a||!r)return toast("Indiquez le montant envoyé et la référence de la transaction.");
+ const x=await sb.from("paiements").insert({methode:m,montant:a,telephone:t,reference:r,email:USER.email});if(x.error)return toast("Envoi impossible : "+x.error.message);
+ toast("Déclaration envoyée : votre offre sera activée après vérification.");await loadPay();render()}
+V.abo=()=>{const pro=proOk(),c=cfg(),mm=c.mobile.length,none=!c.carte&&!mm,btn="display:inline-block;background:var(--pr);color:var(--onpr);text-decoration:none;padding:8px 13px;border-radius:8px";
+ const meths=c.mobile.map(m=>m.nom).concat(c.carte?["Carte bancaire"]:[]).concat(["Autre"]);
+ const acc=`<div class="card"><b>Mon compte</b>${USER?`<p>Connecté : ${E(USER.email)}</p><button class="g" onclick="logout()">Se déconnecter</button>`:`<p class="mt">Créez un compte pour sauvegarder vos projets en ligne et les retrouver sur tous vos appareils.</p><div class="row"><button class="b" onclick="authUI('','up')">Créer un compte</button><button class="g" onclick="authUI('','in')">Se connecter</button></div>${sb?"":`<p class="mt" style="margin:8px 0 0">Les comptes en ligne seront bientôt disponibles. En attendant, vos données restent sur cet appareil.</p>`}`}</div>`;
+ const off=`<h2>Offres</h2><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px"><div class="card"><b>Gratuit</b> ${sb&&!pro?`<span class="tag">Votre offre</span>`:""}<p class="mt" style="margin:6px 0">${LIMITE_GRATUIT} projets, finances, tâches, Gantt, équipes.</p></div><div class="card"><b>Pro · ${E(c.prix)}</b> ${pro?`<span class="tag">Votre offre</span>`:""}<p class="mt" style="margin:6px 0">Projets illimités, export CSV et Excel.</p></div></div>`;
+ let pay="";if(!pro){pay=`<h2>Payer l’offre Pro</h2><div class="card">`+(USER?"":`<p class="mt" style="margin-top:0">Créez d’abord un compte : l’offre Pro sera rattachée à votre e-mail.</p>`)
+  +(c.carte?`<div class="row" style="margin-bottom:10px"><button class="b" onclick="payCard()">Payer par carte bancaire</button><span class="mt">Offre Pro activée après vérification du paiement.</span></div>`:"")
+  +(mm?`<p style="margin:10px 0 6px"><b>Par Mobile Money</b></p>`+c.mobile.map(m=>`<div class="row" style="margin:4px 0">${E(m.nom)} : <b>${E(m.numero)}</b> <span class="mt">(${E(m.titulaire)})</span><button class="g" onclick="copyNum('${String(m.numero).replace(/[^\d+ ]/g,"")}')">Copier</button></div>`).join("")+`<ol class="mt"><li>Envoyez ${E(c.prix)} à l’un de ces numéros.</li><li>Notez la référence de la transaction reçue par SMS.</li><li>Déclarez votre paiement ci-dessous : votre offre est activée après vérification.</li></ol>`:"")
+  +(c.wa?`<a style="${btn}" href="https://wa.me/${c.wa}?text=${encodeURIComponent("Bonjour, je souhaite activer l’offre Pro de Manager Pro. Mon e-mail : "+(USER?USER.email:""))}" target="_blank" rel="noopener">Écrire sur WhatsApp</a>`:"")
+  +(none?`<p class="mt" style="margin:0">Le paiement sera bientôt disponible.</p>`:"")+`</div>`;
+  if(USER&&!none)pay+=`<div class="card"><b>J’ai envoyé le paiement</b><p class="mt" style="margin:4px 0 10px">Renseignez ces informations : votre offre est activée dès que le paiement est vérifié.</p><div class="row"><select id="dp_m" aria-label="Moyen de paiement">${opt(meths.map(x=>[x,x]),"")}</select><input id="dp_a" placeholder="Montant envoyé" style="width:150px"><input id="dp_t" type="tel" placeholder="Numéro qui a envoyé" style="width:170px"><input id="dp_r" placeholder="Référence de la transaction" style="width:210px"><button class="b" onclick="declarePay()">Envoyer la déclaration</button></div></div>`}
+ const mine=MESP.length?`<div class="card tw"><b>Mes paiements déclarés</b><table><tr><th>Date</th><th>Moyen</th><th>Montant</th><th>Référence</th><th>Statut</th></tr>${MESP.map(x=>`<tr><td>${E((x.created_at||"").slice(0,10))}</td><td>${E(x.methode)}</td><td>${E(x.montant)}</td><td>${E(x.reference)}</td><td>${stl(x.statut)}</td></tr>`).join("")}</table></div>`:"";
+ return`<h1>Compte et abonnement</h1>`+acc+off+pay+mine};
+function paieBody(){if(!CFGD)CFGD=JSON.parse(JSON.stringify(Object.keys(CFG).length?CFG:{prix:PRIX_PRO,whatsapp:WHATSAPP,carte:LIEN_PAIEMENT,mobile:MOBILE_MONEY}));const d=CFGD;d.mobile=d.mobile||[];
+ const f=(id,l,k,ph)=>`<label for="${id}">${l}</label><input id="${id}" value="${E(d[k]||"")}" oninput="CFGD.${k}=this.value" placeholder="${ph}">`;
+ return`<div class="card"><b>Mes moyens de paiement (visibles par vos clients)</b>${f("cf_p","Prix de l’offre Pro","prix","6 € par mois")}${f("cf_w","WhatsApp (indicatif + numéro)","whatsapp","")}${f("cf_c","Lien de paiement par carte (facultatif)","carte","https://")}<label>Numéros Mobile Money</label>`
+ +d.mobile.map((m,i)=>`<div class="row" style="margin-bottom:6px"><input placeholder="Opérateur (MTN, Airtel…)" value="${E(m.nom)}" oninput="CFGD.mobile[${i}].nom=this.value" style="flex:1;min-width:130px"><input placeholder="Numéro" value="${E(m.numero)}" oninput="CFGD.mobile[${i}].numero=this.value" style="flex:1;min-width:130px"><input placeholder="Titulaire" value="${E(m.titulaire)}" oninput="CFGD.mobile[${i}].titulaire=this.value" style="flex:1;min-width:130px"><button class="g d" onclick="CFGD.mobile.splice(${i},1);render()" aria-label="Supprimer ce numéro">×</button></div>`).join("")
+ +`<div class="row" style="margin-top:8px"><button class="g" onclick="CFGD.mobile.push({nom:'',numero:'',titulaire:''});render()">Ajouter un numéro</button><button class="b" onclick="saveCfg()">Enregistrer</button></div></div>`
+ +`<div class="card tw"><b>Paiements déclarés par les clients</b>`+(PAYS.length?`<table><tr><th>Date</th><th>Client</th><th>Moyen</th><th>Montant</th><th>Référence</th><th>Statut</th><th></th></tr>${PAYS.map(x=>`<tr><td>${E((x.created_at||"").slice(0,10))}</td><td>${E(x.email)}<div class="mt">${E(x.telephone)}</div></td><td>${E(x.methode)}</td><td>${E(x.montant)}</td><td>${E(x.reference)}</td><td>${stl(x.statut)}</td><td>${x.statut=="en_attente"?`<div class="row"><select id="dur${x.id}" aria-label="Durée"><option value="31">1 mois</option><option value="93">3 mois</option><option value="365">1 an</option></select><button class="b" onclick="valPay(${x.id})">Valider</button><button class="g d" onclick="refPay(${x.id})">Refuser</button></div>`:""}</td></tr>`).join("")}</table>`:`<p class="mt" style="margin:8px 0 0">Aucune déclaration pour le moment.</p>`)+`<p class="mt" style="margin:10px 0 0">Vérifiez le paiement dans votre application Mobile Money avant de valider.</p></div>`}
+async function saveCfg(){const r=await sb.from("config_paiement").upsert({id:1,data:CFGD,updated_at:new Date().toISOString()});if(r.error)return toast("Enregistrement impossible : "+r.error.message);CFG=JSON.parse(JSON.stringify(CFGD));toast("Moyens de paiement enregistrés.");render()}
+async function valPay(id){const r=await sb.rpc("valider_paiement",{pid:id,jours:+$("#dur"+id).value});if(r.error)return toast("Validation impossible : "+r.error.message);toast("Offre Pro activée pour ce client.");await loadPay();render()}
+async function refPay(id){const r=await sb.from("paiements").update({statut:"refuse",traite_le:new Date().toISOString()}).eq("id",id);if(r.error)return toast("Refus impossible : "+r.error.message);await loadPay();render()}
+function tabGo(k){st=k;render();if(k=="compte"||k=="paie")loadPay().then(render)}
+const sb0=setBody;setBody=function(){return st=="profil"?profBody():st=="paie"?paieBody():sb0()};
+V.set=()=>`<h1>Paramètres</h1><div class="tabs">${[["profil","Profil"]].concat(TS).concat(ADMIN?[["paie","Paiements (admin)"]]:[]).map(([k,l])=>`<button class="${st==k?"on":""}" onclick="tabGo('${k}')">${l}</button>`).join("")}</div>`+setBody();
+/* ===== FIN DU BLOC ===== */
+function render(){const it=[["dash","Tableau de bord"],["fin","Finances"],["proj","Projets"],["team","Équipes"]];
+ $("#nav").innerHTML=`<h3 style="display:flex;align-items:center;gap:10px"><img src="logo.svg" width="38" height="38" alt="">Manager Pro</h3>`+it.map(([k,l])=>`<button class="${view==k?"on":""}" onclick="go('${k}')">${l}</button>`).join("")+`<span class="sp"></span><button class="chip" onclick="st='profil';go('set')" aria-label="Mon profil">${avatar(32)}<span class="cn">${E(PROFIL.nom||(USER?USER.email:"Mon profil"))}</span></button><button class="${view=="set"?"on":""}" onclick="go('set')">Paramètres</button>`;
+ $("#main").innerHTML=V[view]();modal()}
+
+render();
+</script></body></html>
