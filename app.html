@@ -51,8 +51,8 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:8px 6px;
 .md{background:var(--sf);border-radius:14px;max-width:560px;width:100%;max-height:92%;overflow:auto;padding:18px}
 .md input,.md select,.md textarea{width:100%}
 #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:24px;background:var(--tx);color:var(--bg);padding:9px 16px;border-radius:99px;z-index:99;display:none}
-@media (max-width:760px){.app{flex-direction:column-reverse}nav{width:auto;flex-direction:row;overflow-x:auto;padding:6px}nav h3,nav .sp{display:none}nav button{white-space:nowrap}main{padding:14px}.kb{grid-template-columns:repeat(3,230px)}}
-select option{background:var(--sf);color:var(--tx)}a{color:var(--prt)}::placeholder{color:var(--mt);opacity:.85}.card b,.md b{color:var(--tx)}</style><script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script></head><body>
+@media (max-width:760px){.app{flex-direction:column-reverse}nav{width:auto;flex-direction:row;overflow-x:auto;padding:6px}nav h3,nav .sp,nav .chip .cn{display:none}nav button{white-space:nowrap}main{padding:14px}.kb{grid-template-columns:repeat(3,230px)}}
+nav .chip{display:flex;align-items:center;gap:10px;overflow:hidden}nav .chip .cn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}select option{background:var(--sf);color:var(--tx)}a{color:var(--prt)}::placeholder{color:var(--mt);opacity:.85}.card b,.md b{color:var(--tx)}</style><script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script></head><body>
 <div class="app"><nav id="nav"></nav><main id="main"></main></div>
 <div id="modal"></div><div id="toast"></div>
 <script>
@@ -224,7 +224,7 @@ V.roles=()=>{const used=new Set(S.teams.flatMap(t=>t.members.map(m=>m.r))),rs=S.
 
 /* ===== MANAGER PRO : compte en ligne, offre Pro, installation ===== */
 /* À REMPLIR plus tard (voir le guide). Tant que SB_URL est vide, l’application reste en mode local, sans limite. */
-const SB_URL="https://aphjhygqxtexpcehpxwq.supabase.co",SB_KEY="sb_publishable_k00WwSoVHQVAbaVRge1FfQ_EgHhAnTv",LIEN_PAIEMENT="",LIMITE_GRATUIT=2;
+const SB_URL="",SB_KEY="",LIEN_PAIEMENT="",LIMITE_GRATUIT=2;
 /* Paiement. LIEN_PAIEMENT = lien carte bancaire. MOBILE_MONEY = vos numéros. WHATSAPP = numéro avec indicatif pays, chiffres seulement. */
 const PRIX_PRO="6 € par mois",WHATSAPP="",EMAIL_PARAM="";/* EMAIL_PARAM : nom du paramètre qui préremplit l’e-mail dans votre lien de paiement (Stripe : prefilled_email ; Lemon Squeezy : checkout[email]). Laissez vide si vous ne savez pas. */
 const MOBILE_MONEY=[/* {nom:"MTN Mobile Money",numero:"06 000 00 00",titulaire:"Votre nom"},{nom:"Airtel Money",numero:"05 000 00 00",titulaire:"Votre nom"} */];
@@ -303,10 +303,78 @@ function setBody(){
  if(st=="compte")return sub(V.abo());
  if(st=="roles")return sub(V.roles());
  if(st=="don")return`<div class="card"><b>Exporter</b><div class="row" style="margin:8px 0 16px"><button class="g" onclick="exportCSV('tx')">Opérations (CSV)</button><button class="g" onclick="exportCSV('tk')">Tâches (CSV)</button><button class="g" onclick="exportXLSX()">Tout en Excel</button></div>${DEFER?`<b>Installer</b><div class="row" style="margin:8px 0 16px"><button class="b" onclick="installApp()">Installer l’application</button></div>`:""}<b>Zone sensible</b><p class="mt" style="margin:6px 0 10px">Efface tous les projets, tâches, équipes et opérations${USER?" de cet appareil et de votre compte en ligne":" de cet appareil"}.</p><button class="g d" onclick="resetAll()">${dz?"Confirmer : tout effacer":"Tout effacer et repartir à zéro"}</button></div>`;
- return`<div class="card"><b>Aide et informations</b><p style="margin:10px 0 4px"><a href="confidentialite.html">Politique de confidentialité</a></p><p style="margin:4px 0"><a href="conditions.html">Conditions d’utilisation</a></p>${WHATSAPP?`<p style="margin:4px 0"><a href="https://wa.me/${WHATSAPP.replace(/\D/g,"")}" target="_blank" rel="noopener">Contacter le support sur WhatsApp</a></p>`:""}<p class="mt" style="margin:12px 0 0">Manager Pro · version bêta · build 8 du 25 novembre 2026</p></div>`}
+ return`<div class="card"><b>Aide et informations</b><p style="margin:10px 0 4px"><a href="confidentialite.html">Politique de confidentialité</a></p><p style="margin:4px 0"><a href="conditions.html">Conditions d’utilisation</a></p>${WHATSAPP?`<p style="margin:4px 0"><a href="https://wa.me/${WHATSAPP.replace(/\D/g,"")}" target="_blank" rel="noopener">Contacter le support sur WhatsApp</a></p>`:""}<p class="mt" style="margin:12px 0 0">Manager Pro · version bêta · build 9 du 26 novembre 2026</p></div>`}
 V.set=()=>`<h1>Paramètres</h1><div class="tabs">${TS.map(([k,l])=>`<button class="${st==k?"on":""}" onclick="st='${k}';render()">${l}</button>`).join("")}</div>`+setBody();
+/* ===== MANAGER PRO : profil, moyens de paiement, déclaration de paiement ===== */
+let CFG={},CFGD=null,ADMIN=false,PAYS=[],MESP=[],CAM=null;
+let PROFIL=(()=>{try{return JSON.parse(localStorage.getItem("gp_profil"))||{}}catch(e){return{}}})();
+const cfg=()=>({prix:CFG.prix||PRIX_PRO,wa:String(CFG.whatsapp||WHATSAPP||"").replace(/\D/g,""),carte:CFG.carte||LIEN_PAIEMENT,mobile:(CFG.mobile&&CFG.mobile.length)?CFG.mobile:MOBILE_MONEY});
+const stl=s=>({en_attente:"En attente de vérification",valide:"Validé",refuse:"Refusé"}[s]||s);
+function avatar(n){const p=PROFIL.photo;if(p)return`<img src="${E(p)}" alt="" style="width:${n}px;height:${n}px;border-radius:50%;object-fit:cover;flex:none">`;
+ return`<span style="width:${n}px;height:${n}px;border-radius:50%;background:var(--pr);color:var(--onpr);display:inline-flex;align-items:center;justify-content:center;font-weight:800;flex:none">${E(((PROFIL.nom||(USER&&USER.email)||"M").trim()[0]||"M").toUpperCase())}</span>`}
+function pf(k,v){PROFIL[k]=v}
+async function saveProfil(){try{localStorage.setItem("gp_profil",JSON.stringify(PROFIL))}catch(e){}
+ if(sb&&USER){const r=await sb.from("profils").upsert({user_id:USER.id,nom:PROFIL.nom||"",entreprise:PROFIL.entreprise||"",telephone:PROFIL.telephone||"",photo:PROFIL.photo||"",updated_at:new Date().toISOString()});if(r.error){render();return toast("Profil enregistré sur cet appareil seulement : "+r.error.message)}}
+ render();toast("Profil enregistré.")}
+function toSquare(src,w,h){const c=document.createElement("canvas");c.width=c.height=256;const s=Math.min(w,h);c.getContext("2d").drawImage(src,(w-s)/2,(h-s)/2,s,s,0,0,256,256);return c.toDataURL("image/jpeg",.82)}
+function pickPhoto(inp){const f=inp.files&&inp.files[0];if(!f)return;if(!/^image\//.test(f.type))return toast("Choisissez une image.");
+ const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{PROFIL.photo=toSquare(im,im.width,im.height);render()};im.onerror=()=>toast("Image illisible.");im.src=fr.result};fr.readAsDataURL(f)}
+async function camOpen(){if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)return $("#pf_cam").click();
+ try{CAM=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"}});box.innerHTML=`<div class="ov"><div class="md"><b style="font-size:18px">Prendre une photo</b><video id="cv" autoplay playsinline muted style="width:100%;border-radius:10px;margin:10px 0"></video><div class="row"><button class="b" onclick="camShot()">Capturer</button><button class="g" onclick="camStop()">Annuler</button></div></div></div>`;$("#cv").srcObject=CAM}
+ catch(e){toast("Caméra indisponible : choisissez une photo.");$("#pf_cam").click()}}
+function camStop(){if(CAM){CAM.getTracks().forEach(t=>t.stop());CAM=null}closeAuth()}
+function camShot(){const v=$("#cv");if(!v||!v.videoWidth)return;PROFIL.photo=toSquare(v,v.videoWidth,v.videoHeight);camStop();render()}
+function profBody(){return`<div class="card"><div class="row" style="gap:16px">${avatar(88)}<div><div class="row"><button class="g" onclick="$('#pf_file').click()">Choisir une photo</button><button class="g" onclick="camOpen()">Prendre une photo</button>${PROFIL.photo?`<button class="g d" onclick="PROFIL.photo='';render()">Retirer</button>`:""}</div><p class="mt" style="margin:6px 0 0">La photo est recadrée en carré et réduite automatiquement.</p></div></div>
+<input id="pf_file" type="file" accept="image/*" hidden onchange="pickPhoto(this)"><input id="pf_cam" type="file" accept="image/*" capture="user" hidden onchange="pickPhoto(this)">
+<label for="pf_n">Nom complet</label><input id="pf_n" value="${E(PROFIL.nom||"")}" oninput="pf('nom',this.value)" autocomplete="name">
+<label for="pf_e">Entreprise ou activité</label><input id="pf_e" value="${E(PROFIL.entreprise||"")}" oninput="pf('entreprise',this.value)" autocomplete="organization">
+<label for="pf_t">Téléphone</label><input id="pf_t" type="tel" value="${E(PROFIL.telephone||"")}" oninput="pf('telephone',this.value)" autocomplete="tel">
+<label for="pf_m">E-mail</label><input id="pf_m" value="${E(USER?USER.email:"Non connecté")}" disabled>
+<div class="row" style="margin-top:14px"><button class="b" onclick="saveProfil()">Enregistrer le profil</button></div>${USER?"":`<p class="mt" style="margin:10px 0 0">Connectez-vous pour retrouver votre profil sur tous vos appareils.</p>`}</div>`}
+async function loadCfg(){if(!sb)return;try{const r=await sb.from("config_paiement").select("data").eq("id",1).maybeSingle();if(r.data&&r.data.data)CFG=r.data.data}catch(e){}}
+async function loadPay(){if(!sb||!USER)return;try{const r=await sb.from("paiements").select("*").order("created_at",{ascending:false}).limit(60),all=r.data||[];MESP=all.filter(x=>x.user_id==USER.id);PAYS=ADMIN?all:[]}catch(e){}}
+async function loadExtras(){if(!sb||!USER)return;
+ try{const a=await sb.from("admins").select("user_id").maybeSingle();ADMIN=!!a.data}catch(e){}
+ await loadCfg();
+ try{const p=await sb.from("profils").select("nom,entreprise,telephone,photo").eq("user_id",USER.id).maybeSingle();if(p.data)PROFIL=Object.assign({},PROFIL,p.data)}catch(e){}
+ await loadPay();render()}
+const lc0=loadCloud;loadCloud=async function(){await lc0();await loadExtras()};
+const lo0=logout;logout=async function(){await lo0();ADMIN=false;PAYS=[];MESP=[];render()};
+if(sb)loadCfg().then(()=>render());
+function copyNum(n){try{navigator.clipboard.writeText(n).then(()=>toast("Numéro copié."),()=>toast(n))}catch(e){toast(n)}}
+function payCard(){const c=cfg();if(!USER)return authUI("Créez d’abord un compte : votre offre Pro y sera rattachée.","up");if(!c.carte)return toast("Le paiement par carte n’est pas encore configuré.");
+ window.open(c.carte+(EMAIL_PARAM?(c.carte.includes("?")?"&":"?")+EMAIL_PARAM+"="+encodeURIComponent(USER.email):""),"_blank","noopener")}
+async function declarePay(){if(!sb||!USER)return authUI("Connectez-vous pour déclarer un paiement.","in");
+ const m=$("#dp_m").value,a=$("#dp_a").value.trim(),t=$("#dp_t").value.trim(),r=$("#dp_r").value.trim();if(!a||!r)return toast("Indiquez le montant envoyé et la référence de la transaction.");
+ const x=await sb.from("paiements").insert({methode:m,montant:a,telephone:t,reference:r,email:USER.email});if(x.error)return toast("Envoi impossible : "+x.error.message);
+ toast("Déclaration envoyée : votre offre sera activée après vérification.");await loadPay();render()}
+V.abo=()=>{const pro=proOk(),c=cfg(),mm=c.mobile.length,none=!c.carte&&!mm,btn="display:inline-block;background:var(--pr);color:var(--onpr);text-decoration:none;padding:8px 13px;border-radius:8px";
+ const meths=c.mobile.map(m=>m.nom).concat(c.carte?["Carte bancaire"]:[]).concat(["Autre"]);
+ const acc=`<div class="card"><b>Mon compte</b>${USER?`<p>Connecté : ${E(USER.email)}</p><button class="g" onclick="logout()">Se déconnecter</button>`:`<p class="mt">Créez un compte pour sauvegarder vos projets en ligne et les retrouver sur tous vos appareils.</p><div class="row"><button class="b" onclick="authUI('','up')">Créer un compte</button><button class="g" onclick="authUI('','in')">Se connecter</button></div>${sb?"":`<p class="mt" style="margin:8px 0 0">Les comptes en ligne seront bientôt disponibles. En attendant, vos données restent sur cet appareil.</p>`}`}</div>`;
+ const off=`<h2>Offres</h2><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px"><div class="card"><b>Gratuit</b> ${sb&&!pro?`<span class="tag">Votre offre</span>`:""}<p class="mt" style="margin:6px 0">${LIMITE_GRATUIT} projets, finances, tâches, Gantt, équipes.</p></div><div class="card"><b>Pro · ${E(c.prix)}</b> ${pro?`<span class="tag">Votre offre</span>`:""}<p class="mt" style="margin:6px 0">Projets illimités, export CSV et Excel.</p></div></div>`;
+ let pay="";if(!pro){pay=`<h2>Payer l’offre Pro</h2><div class="card">`+(USER?"":`<p class="mt" style="margin-top:0">Créez d’abord un compte : l’offre Pro sera rattachée à votre e-mail.</p>`)
+  +(c.carte?`<div class="row" style="margin-bottom:10px"><button class="b" onclick="payCard()">Payer par carte bancaire</button><span class="mt">Offre Pro activée après vérification du paiement.</span></div>`:"")
+  +(mm?`<p style="margin:10px 0 6px"><b>Par Mobile Money</b></p>`+c.mobile.map(m=>`<div class="row" style="margin:4px 0">${E(m.nom)} : <b>${E(m.numero)}</b> <span class="mt">(${E(m.titulaire)})</span><button class="g" onclick="copyNum('${String(m.numero).replace(/[^\d+ ]/g,"")}')">Copier</button></div>`).join("")+`<ol class="mt"><li>Envoyez ${E(c.prix)} à l’un de ces numéros.</li><li>Notez la référence de la transaction reçue par SMS.</li><li>Déclarez votre paiement ci-dessous : votre offre est activée après vérification.</li></ol>`:"")
+  +(c.wa?`<a style="${btn}" href="https://wa.me/${c.wa}?text=${encodeURIComponent("Bonjour, je souhaite activer l’offre Pro de Manager Pro. Mon e-mail : "+(USER?USER.email:""))}" target="_blank" rel="noopener">Écrire sur WhatsApp</a>`:"")
+  +(none?`<p class="mt" style="margin:0">Le paiement sera bientôt disponible.</p>`:"")+`</div>`;
+  if(USER&&!none)pay+=`<div class="card"><b>J’ai envoyé le paiement</b><p class="mt" style="margin:4px 0 10px">Renseignez ces informations : votre offre est activée dès que le paiement est vérifié.</p><div class="row"><select id="dp_m" aria-label="Moyen de paiement">${opt(meths.map(x=>[x,x]),"")}</select><input id="dp_a" placeholder="Montant envoyé" style="width:150px"><input id="dp_t" type="tel" placeholder="Numéro qui a envoyé" style="width:170px"><input id="dp_r" placeholder="Référence de la transaction" style="width:210px"><button class="b" onclick="declarePay()">Envoyer la déclaration</button></div></div>`}
+ const mine=MESP.length?`<div class="card tw"><b>Mes paiements déclarés</b><table><tr><th>Date</th><th>Moyen</th><th>Montant</th><th>Référence</th><th>Statut</th></tr>${MESP.map(x=>`<tr><td>${E((x.created_at||"").slice(0,10))}</td><td>${E(x.methode)}</td><td>${E(x.montant)}</td><td>${E(x.reference)}</td><td>${stl(x.statut)}</td></tr>`).join("")}</table></div>`:"";
+ return`<h1>Compte et abonnement</h1>`+acc+off+pay+mine};
+function paieBody(){if(!CFGD)CFGD=JSON.parse(JSON.stringify(Object.keys(CFG).length?CFG:{prix:PRIX_PRO,whatsapp:WHATSAPP,carte:LIEN_PAIEMENT,mobile:MOBILE_MONEY}));const d=CFGD;d.mobile=d.mobile||[];
+ const f=(id,l,k,ph)=>`<label for="${id}">${l}</label><input id="${id}" value="${E(d[k]||"")}" oninput="CFGD.${k}=this.value" placeholder="${ph}">`;
+ return`<div class="card"><b>Mes moyens de paiement (visibles par vos clients)</b>${f("cf_p","Prix de l’offre Pro","prix","6 € par mois")}${f("cf_w","WhatsApp (indicatif + numéro)","whatsapp","")}${f("cf_c","Lien de paiement par carte (facultatif)","carte","https://")}<label>Numéros Mobile Money</label>`
+ +d.mobile.map((m,i)=>`<div class="row" style="margin-bottom:6px"><input placeholder="Opérateur (MTN, Airtel…)" value="${E(m.nom)}" oninput="CFGD.mobile[${i}].nom=this.value" style="flex:1;min-width:130px"><input placeholder="Numéro" value="${E(m.numero)}" oninput="CFGD.mobile[${i}].numero=this.value" style="flex:1;min-width:130px"><input placeholder="Titulaire" value="${E(m.titulaire)}" oninput="CFGD.mobile[${i}].titulaire=this.value" style="flex:1;min-width:130px"><button class="g d" onclick="CFGD.mobile.splice(${i},1);render()" aria-label="Supprimer ce numéro">×</button></div>`).join("")
+ +`<div class="row" style="margin-top:8px"><button class="g" onclick="CFGD.mobile.push({nom:'',numero:'',titulaire:''});render()">Ajouter un numéro</button><button class="b" onclick="saveCfg()">Enregistrer</button></div></div>`
+ +`<div class="card tw"><b>Paiements déclarés par les clients</b>`+(PAYS.length?`<table><tr><th>Date</th><th>Client</th><th>Moyen</th><th>Montant</th><th>Référence</th><th>Statut</th><th></th></tr>${PAYS.map(x=>`<tr><td>${E((x.created_at||"").slice(0,10))}</td><td>${E(x.email)}<div class="mt">${E(x.telephone)}</div></td><td>${E(x.methode)}</td><td>${E(x.montant)}</td><td>${E(x.reference)}</td><td>${stl(x.statut)}</td><td>${x.statut=="en_attente"?`<div class="row"><select id="dur${x.id}" aria-label="Durée"><option value="31">1 mois</option><option value="93">3 mois</option><option value="365">1 an</option></select><button class="b" onclick="valPay(${x.id})">Valider</button><button class="g d" onclick="refPay(${x.id})">Refuser</button></div>`:""}</td></tr>`).join("")}</table>`:`<p class="mt" style="margin:8px 0 0">Aucune déclaration pour le moment.</p>`)+`<p class="mt" style="margin:10px 0 0">Vérifiez le paiement dans votre application Mobile Money avant de valider.</p></div>`}
+async function saveCfg(){const r=await sb.from("config_paiement").upsert({id:1,data:CFGD,updated_at:new Date().toISOString()});if(r.error)return toast("Enregistrement impossible : "+r.error.message);CFG=JSON.parse(JSON.stringify(CFGD));toast("Moyens de paiement enregistrés.");render()}
+async function valPay(id){const r=await sb.rpc("valider_paiement",{pid:id,jours:+$("#dur"+id).value});if(r.error)return toast("Validation impossible : "+r.error.message);toast("Offre Pro activée pour ce client.");await loadPay();render()}
+async function refPay(id){const r=await sb.from("paiements").update({statut:"refuse",traite_le:new Date().toISOString()}).eq("id",id);if(r.error)return toast("Refus impossible : "+r.error.message);await loadPay();render()}
+function tabGo(k){st=k;render();if(k=="compte"||k=="paie")loadPay().then(render)}
+const sb0=setBody;setBody=function(){return st=="profil"?profBody():st=="paie"?paieBody():sb0()};
+V.set=()=>`<h1>Paramètres</h1><div class="tabs">${[["profil","Profil"]].concat(TS).concat(ADMIN?[["paie","Paiements (admin)"]]:[]).map(([k,l])=>`<button class="${st==k?"on":""}" onclick="tabGo('${k}')">${l}</button>`).join("")}</div>`+setBody();
+/* ===== FIN DU BLOC ===== */
 function render(){const it=[["dash","Tableau de bord"],["fin","Finances"],["proj","Projets"],["team","Équipes"]];
- $("#nav").innerHTML=`<h3 style="display:flex;align-items:center;gap:10px"><img src="logo.svg" width="38" height="38" alt="">Manager Pro</h3>`+it.map(([k,l])=>`<button class="${view==k?"on":""}" onclick="go('${k}')">${l}</button>`).join("")+`<span class="sp"></span><button class="${view=="set"?"on":""}" onclick="go('set')">Paramètres</button>`;
+ $("#nav").innerHTML=`<h3 style="display:flex;align-items:center;gap:10px"><img src="logo.svg" width="38" height="38" alt="">Manager Pro</h3>`+it.map(([k,l])=>`<button class="${view==k?"on":""}" onclick="go('${k}')">${l}</button>`).join("")+`<span class="sp"></span><button class="chip" onclick="st='profil';go('set')" aria-label="Mon profil">${avatar(32)}<span class="cn">${E(PROFIL.nom||(USER?USER.email:"Mon profil"))}</span></button><button class="${view=="set"?"on":""}" onclick="go('set')">Paramètres</button>`;
  $("#main").innerHTML=V[view]();modal()}
 
 render();
